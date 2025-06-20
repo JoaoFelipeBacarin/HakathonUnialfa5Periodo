@@ -8,15 +8,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "turmas")
-public class Turma {
+@Table(name = "alunos_turmas")
+public class AlunoTurma {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nome;
+    @ManyToOne
+    private Usuario aluno;
 
     @ManyToOne
-    private Usuario professor;
+    private Turma turma;
 }
