@@ -19,6 +19,4 @@ public class TurmaService {
     public List<Turma> listarTodas() {
         return turmaRepo.findAll();
     }
-=======
-public class TurmaService {
 }
