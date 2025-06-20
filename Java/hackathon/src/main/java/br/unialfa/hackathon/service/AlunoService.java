@@ -1,6 +1,6 @@
 package br.unialfa.hackathon.service;
 
-import br.unialfa.hackathon.repository.AlunoRepository;
+import br.unialfa.hackathon.repository.AlunoTurmaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,5 +8,5 @@ import org.springframework.stereotype.Service;
 public class AlunoService {
 
     @Autowired
-    private AlunoRepository repository;
+    private AlunoTurmaRepository repository;
 }
