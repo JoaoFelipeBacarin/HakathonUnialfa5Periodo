@@ -1,11 +1,9 @@
 package br.unialfa.hackathon.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Getter
@@ -26,10 +24,7 @@ public class Aluno {
     private Boolean status;
     private Date dataDeCadastro;
 
-    @OneToMany(mappedBy = "turma", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Turma> turmas;
-
-
-
+    @ManyToOne
+    @JoinColumn(name = "turma_id")
+    private Turma turma;
 }

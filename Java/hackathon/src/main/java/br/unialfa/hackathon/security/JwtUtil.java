@@ -1,7 +1,5 @@
 package br.unialfa.hackathon.security;
 
-
-
 import br.unialfa.hackathon.model.Usuario;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
