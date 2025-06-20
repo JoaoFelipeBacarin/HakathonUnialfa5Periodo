@@ -9,8 +9,6 @@ import 'package:hackathonflutter/ui/pages/gabarito_page.dart';
 import 'package:hackathonflutter/ui/widgets/circulo_espera.dart';
 import 'package:hackathonflutter/ui/widgets/msg_alerta.dart';
 import 'package:hackathonflutter/extensions/string_extension.dart';
-// import 'package:hackathonflutter/ui/widgets/barra_titulo.dart'; // Removido ou comentado se não for usar
-
 
 // Enum para gerenciar as diferentes visualizações da página
 enum ListagemView { turmas, provas, alunos }
@@ -29,100 +27,43 @@ class _ListagemPageState extends State<ListagemPage> {
   final AlunoService _alunoService = AlunoService();
 
   ListagemView _currentView = ListagemView.turmas;
-  Turma? _selectedTurma;
-  Prova? _selectedProva;
-  // Aluno? _selectedAluno; // Não será mais necessário manter o aluno aqui para o fluxo de gabarito
+  String _appBarTitle = 'Turmas';
 
   List<Turma> _turmas = [];
   List<Prova> _provas = [];
   List<Aluno> _alunos = [];
-  List<Aluno> _alunosFiltrados = []; // Para a busca de alunos
 
-  bool _carregando = true;
-  String _searchQuery = ''; // Para o campo de busca de alunos
+  Turma? _selectedTurma;
+  Prova? _selectedProva; // Alterado para Prova? para ser nulo inicialmente
+
+  bool _carregando = false;
 
   @override
   void initState() {
     super.initState();
-    // Sempre começa em turmas, a exibição de alunos é que depende de !isViewingGabarito
-    _currentView = ListagemView.turmas;
-    _carregarDadosIniciais();
+    _carregarTurmas();
   }
 
-  // Novo getter para o título da AppBar baseado na view atual e no modo
-  String get _appBarTitle {
-    if (widget.isViewingGabarito) {
-      if (_currentView == ListagemView.turmas) {
-        return 'Selecionar Turma do Gabarito';
-      } else if (_currentView == ListagemView.provas) {
-        return 'Selecionar Prova do Gabarito';
-      }
-      // Não haverá ListagemView.alunos para gabarito, então não precisamos de um título aqui
-    } else { // Fluxo padrão de seleção de aluno
-      if (_currentView == ListagemView.turmas) {
-        return 'Selecionar Turma';
-      } else if (_currentView == ListagemView.provas) {
-        return 'Selecionar Prova';
-      } else if (_currentView == ListagemView.alunos) {
-        return 'Selecionar Aluno';
-      }
-    }
-    return 'Listagem'; // Fallback
-  }
-
-  // Novo método para o comportamento do botão de voltar da AppBar
-  void _onBackPressed() {
-    if (_carregando) return; // Não permite voltar se estiver carregando
-
-    if (widget.isViewingGabarito) {
-      if (_currentView == ListagemView.provas) {
-        setState(() {
-          _currentView = ListagemView.turmas;
-          _selectedTurma = null;
-          _selectedProva = null;
-          _provas.clear(); // Limpa as provas ao voltar para turmas
-        });
-      } else if (_currentView == ListagemView.turmas) {
-        Navigator.pop(context); // Volta para a HomePage
-      }
-    } else { // Fluxo de seleção de aluno
-      if (_currentView == ListagemView.alunos) {
-        setState(() {
-          _currentView = ListagemView.provas;
-          // Não limpa _selectedProva aqui, pois ainda precisamos dele para filtrar alunos
-        });
-      } else if (_currentView == ListagemView.provas) {
-        setState(() {
-          _currentView = ListagemView.turmas;
-          _selectedTurma = null;
-          _selectedProva = null;
-          _alunos.clear();
-          _alunosFiltrados.clear();
-          _provas.clear(); // Limpa as provas ao voltar para turmas
-        });
-      } else if (_currentView == ListagemView.turmas) {
-        Navigator.pop(context); // Volta para a HomePage
-      }
-    }
-  }
-
-
-  Future<void> _carregarDadosIniciais() async {
+  Future<void> _carregarTurmas() async {
     setState(() {
       _carregando = true;
     });
     try {
       _turmas = await _avaliacaoService.buscarTurmas();
       setState(() {
-        _carregando = false;
+        _currentView = ListagemView.turmas;
+        _appBarTitle = 'Turmas';
       });
     } catch (e) {
       if (mounted) {
         MsgAlerta().show(
           context: context,
           titulo: 'Erro',
-          texto: 'Erro ao carregar turmas: $e',
+          texto: 'Não foi possível carregar as turmas: $e',
         );
+      }
+    } finally {
+      if (mounted) {
         setState(() {
           _carregando = false;
         });
@@ -130,129 +71,156 @@ class _ListagemPageState extends State<ListagemPage> {
     }
   }
 
-  Future<void> _selecionarTurma(Turma turma) async {
+  Future<void> _carregarProvas(int turmaId) async {
     setState(() {
-      _selectedTurma = turma;
       _carregando = true;
-      _currentView = ListagemView.provas; // Sempre vai para provas
-      _provas.clear(); // Limpa provas antigas antes de carregar novas
+    });
+    try {
+      _provas = await _avaliacaoService.buscarProvasPorTurma(turmaId);
+      setState(() {
+        _currentView = ListagemView.provas;
+        _appBarTitle = 'Provas de ${_selectedTurma!.nome}';
+      });
+    } catch (e) {
+      if (mounted) {
+        MsgAlerta().show(
+          context: context,
+          titulo: 'Erro',
+          texto: 'Não foi possível carregar as provas: $e',
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _carregando = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _carregarAlunos(int turmaId) async {
+    setState(() {
+      _carregando = true;
+    });
+    try {
+      _alunos = await _alunoService.buscarAlunosPorTurma(turmaId);
+      setState(() {
+        _currentView = ListagemView.alunos;
+        _appBarTitle = 'Alunos de ${_selectedTurma!.nome}';
+      });
+    } catch (e) {
+      if (mounted) {
+        MsgAlerta().show(
+          context: context,
+          titulo: 'Erro',
+          texto: 'Não foi possível carregar os alunos: $e',
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _carregando = false;
+        });
+      }
+    }
+  }
+
+  void _onBackPressed() {
+    if (_currentView == ListagemView.alunos) {
+      setState(() {
+        _currentView = ListagemView.provas;
+        _appBarTitle = 'Provas de ${_selectedTurma!.nome}';
+        _selectedAluno = null; // Limpa o aluno selecionado
+      });
+    } else if (_currentView == ListagemView.provas) {
+      setState(() {
+        _currentView = ListagemView.turmas;
+        _appBarTitle = 'Turmas';
+        _selectedTurma = null; // Limpa a turma selecionada
+        _selectedProva = null; // Limpa a prova selecionada
+      });
+    } else {
+      Navigator.pop(context); // Se estiver na tela de turmas, volta para a tela anterior
+    }
+  }
+
+  Aluno? _selectedAluno; // Adicionado para manter o aluno selecionado
+
+  // Este método é chamado quando uma prova é selecionada
+  void _selecionarProva(Prova prova) async {
+    setState(() {
+      _selectedProva = prova;
     });
 
-    try {
-      _provas = await _avaliacaoService.buscarProvasPorTurma(turma.id);
-      setState(() {
-        _carregando = false;
-      });
-    } catch (e) {
-      if (mounted) {
-        MsgAlerta().show(
-          context: context,
-          titulo: 'Erro',
-          texto: 'Erro ao carregar provas: $e',
-        );
-        setState(() {
-          _carregando = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _selecionarProva(Prova prova) async {
-    _selectedProva = prova; // Armazena a prova selecionada
-
     if (widget.isViewingGabarito) {
-      // Se estamos no modo de visualização de gabarito, navega diretamente para GabaritoPage
-      if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GabaritoPage.forGabarito(prova: prova), // Usando o construtor nomeado
+      // Se o objetivo da ListagemPage é apenas ver o gabarito oficial
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GabaritoPage.forGabarito(
+            prova: prova, // Apenas passa a prova
+            aluno: null, // explicitamente nulo para visualização de gabarito
           ),
-        );
-      }
+        ),
+      );
     } else {
-      // Se estamos no modo de seleção de aluno, carrega os alunos da turma
-      setState(() {
-        _carregando = true;
-        _currentView = ListagemView.alunos;
-      });
-      try {
-        _alunos = await _alunoService.buscarAlunosPorTurma(_selectedTurma!.id);
-        _alunosFiltrados = _alunos; // Inicializa a lista filtrada com todos os alunos
-        setState(() {
-          _carregando = false;
-        });
-      } catch (e) {
-        if (mounted) {
-          MsgAlerta().show(
-            context: context,
-            titulo: 'Erro',
-            texto: 'Erro ao carregar alunos: $e',
-          );
-          setState(() {
-            _carregando = false;
-          });
-        }
-      }
+      // Se o objetivo é lançar/editar gabarito de um aluno, precisa selecionar o aluno
+      await _carregarAlunos(prova.turmaId);
     }
   }
 
-  // Renomeado para maior clareza, este método só é chamado no fluxo de seleção de aluno
-  void _selecionarAlunoParaAvaliacao(Aluno aluno) {
+  // Este método é chamado quando um aluno é selecionado para avaliação
+  void _selecionarAlunoParaAvaliacao(Aluno aluno) async {
+    // Garante que uma prova foi selecionada antes de prosseguir
     if (_selectedProva == null) {
       MsgAlerta().show(
         context: context,
-        titulo: 'Atenção',
-        texto: 'Por favor, selecione uma prova antes de selecionar o aluno.',
+        titulo: 'Erro',
+        texto: 'Por favor, selecione uma prova antes de prosseguir.',
       );
       return;
     }
-    Navigator.push(
+
+    setState(() {
+      _selectedAluno = aluno;
+    });
+
+    // Navega para a GabaritoPage passando o aluno e a prova
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => GabaritoPage(
-          aluno: aluno,
-          prova: _selectedProva!,
+          aluno: _selectedAluno!, // AGORA ESTÁ SEGURO USAR '!' AQUI
+          prova: _selectedProva!, // E AQUI
         ),
       ),
     );
-  }
 
-  void _filterAlunos(String query) {
-    setState(() {
-      _searchQuery = query;
-      if (query.isEmpty) {
-        _alunosFiltrados = _alunos;
-      } else {
-        _alunosFiltrados = _alunos
-            .where((aluno) =>
-        aluno.nome.toLowerCase().contains(query.toLowerCase()) ||
-            aluno.email.toLowerCase().contains(query.toLowerCase()))
-            .toList();
-      }
-    });
+    // Se a GabaritoPage retornar 'true', significa que o gabarito foi enviado
+    if (result == true) {
+      // Opcional: Recarregar a lista de alunos/respostas aqui se necessário
+      // _carregarAlunos(_selectedTurma!.id); // Exemplo de recarga
+    }
   }
 
   Widget _buildTurmasList() {
-    if (_turmas.isEmpty && !_carregando) {
-      return const Center(child: Text('Nenhuma turma encontrada.'));
-    }
     return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
       itemCount: _turmas.length,
       itemBuilder: (context, index) {
         final turma = _turmas[index];
         return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          elevation: 4,
+          margin: const EdgeInsets.only(bottom: 10.0),
           child: ListTile(
-            contentPadding: const EdgeInsets.all(16.0),
-            title: Text(
-              turma.nome,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            title: Text(turma.nome),
             subtitle: Text('Ano: ${turma.ano}'),
             trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () => _selecionarTurma(turma),
+            onTap: () {
+              setState(() {
+                _selectedTurma = turma;
+              });
+              _carregarProvas(turma.id);
+            },
           ),
         );
       },
@@ -260,25 +228,18 @@ class _ListagemPageState extends State<ListagemPage> {
   }
 
   Widget _buildProvasList() {
-    if (_provas.isEmpty && !_carregando) {
-      return const Center(child: Text('Nenhuma prova encontrada para esta turma.'));
-    }
     return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
       itemCount: _provas.length,
       itemBuilder: (context, index) {
         final prova = _provas[index];
         return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          elevation: 4,
+          margin: const EdgeInsets.only(bottom: 10.0),
           child: ListTile(
-            contentPadding: const EdgeInsets.all(16.0),
-            title: Text(
-              prova.nome,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+            title: Text(prova.nome),
             subtitle: Text('Disciplina: ${prova.disciplina}'),
             trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () => _selecionarProva(prova),
+            onTap: () => _selecionarProva(prova), // Usa o novo método
           ),
         );
       },
@@ -289,57 +250,26 @@ class _ListagemPageState extends State<ListagemPage> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            onChanged: _filterAlunos,
-            decoration: InputDecoration(
-              labelText: 'Buscar Aluno',
-              hintText: 'Digite o nome ou e-mail do aluno',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-            ),
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            'Selecione o aluno para lançar o gabarito da Prova: ${_selectedProva?.nome ?? 'N/A'}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
         Expanded(
-          child: _alunosFiltrados.isEmpty && !_carregando
-              ? const Center(child: Text('Nenhum aluno encontrado para esta prova ou na busca.'))
-              : ListView.builder(
-            itemCount: _alunosFiltrados.length,
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            itemCount: _alunos.length,
             itemBuilder: (context, index) {
-              final aluno = _alunosFiltrados[index];
+              final aluno = _alunos[index];
               return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                elevation: 4,
+                margin: const EdgeInsets.only(bottom: 10.0),
                 child: ListTile(
-                  contentPadding: const EdgeInsets.all(16.0),
-                  leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    child: Text(
-                      aluno.nome.initials,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    aluno.nome,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Turma: ${aluno.turma}'),
-                      Text(
-                        aluno.email,
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
+                  title: Text(aluno.nome),
+                  subtitle: Text('Turma: ${aluno.turma}'),
                   trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () => _selecionarAlunoParaAvaliacao(aluno), // Chamada do método renomeado
+                  onTap: () => _selecionarAlunoParaAvaliacao(aluno),
                 ),
               );
             },
@@ -367,15 +297,13 @@ class _ListagemPageState extends State<ListagemPage> {
             return _buildTurmasList();
           } else if (_currentView == ListagemView.provas) {
             return _buildProvasList();
-          } else if (_currentView == ListagemView.alunos && !widget.isViewingGabarito) {
-            // Só exibe a lista de alunos se não estiver no modo de visualização de gabarito
+          } else if (_currentView == ListagemView.alunos) {
+            // Este bloco agora sempre construirá a lista de alunos se a view for ALUNOS
+            // A condição de isViewingGabarito foi movida para _selecionarProva
             return _buildAlunosList();
-          } else {
-            // Este caso deve ser alcançado apenas se _currentView for ListagemView.alunos
-            // e isViewingGabarito for true, o que não deveria acontecer, pois não há alunos no fluxo de gabarito.
-            // Para segurança, retornamos um texto explicativo.
-            return const Center(child: Text('Modo de visualização de gabarito não exibe alunos diretamente.'));
           }
+          // Fallback para qualquer estado inesperado
+          return const Center(child: Text('Estado de visualização desconhecido.'));
         },
       ),
     );
