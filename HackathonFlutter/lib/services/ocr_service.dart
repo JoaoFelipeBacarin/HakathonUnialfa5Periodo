@@ -1,21 +1,22 @@
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-import 'package:image/image.dart' as img;
-import 'dart:io';
+import 'package:image/image.dart' as img; // Manter, caso seja usado para pré-processamento futuro
+import 'dart:io'; // Manter
 
 class OcrService {
-  final TextRecognizer _textRecognizer = TextRecognizer(); // Removido 'script: TextScript.latin'
+  final TextRecognizer _textRecognizer = TextRecognizer();
 
   Future<Map<String, dynamic>> processGabarito(String imagePath) async {
     final inputImage = InputImage.fromFilePath(imagePath);
     final RecognizedText recognizedText = await _textRecognizer.processImage(inputImage);
 
-    print('Recognized Text:');
+    print('Recognized Text (Full):');
     for (TextBlock block in recognizedText.blocks) {
       print('  Block: ${block.text}');
       for (TextLine line in block.lines) {
         print('    Line: ${line.text}');
+        // Optional: print individual elements for more detail to understand spatial data
         for (TextElement element in line.elements) {
-          print('      Element: ${element.text}');
+          print('      Element: ${element.text}, Bounds: ${element.boundingBox}');
         }
       }
     }
@@ -30,40 +31,131 @@ class OcrService {
       }
     };
 
-    // Simplified logic to extract student ID and exam ID
-    for (TextBlock block in recognizedText.blocks) {
-      if (block.text.toLowerCase().contains("aluno")) {
-        final match = RegExp(r"aluno(?:\s*ID)?:\s*(\w+)", caseSensitive: false).firstMatch(block.text);
-        if (match != null) {
-          extractedData["alunoId"] = match.group(1);
-        }
-      }
-      if (block.text.toLowerCase().contains("prova")) {
-        final match = RegExp(r"prova(?:\s*ID)?:\s*(\w+)", caseSensitive: false).firstMatch(block.text);
-        if (match != null) {
-          extractedData["provaId"] = match.group(1);
-        }
-      }
-    }
+    // --- Nova Lógica Espacial para Extração de Aluno ID e Prova ID ---
+    String? alunoId;
+    String? provaId;
 
-    // Simplified logic to extract answers based on common patterns
-    // This is a very basic heuristic and will likely need refinement
-    // for real-world gabaritos.
-    List<Map<String, String>> respostas = [];
+    // Coletar todos os elementos com suas posições
+    List<Map<String, dynamic>> allElements = [];
+
     for (TextBlock block in recognizedText.blocks) {
       for (TextLine line in block.lines) {
-        // Look for patterns like "1. A", "2. B", "3. C"
-        final RegExp answerPattern = RegExp(r"^(\d+)\.\s*([A-E])", caseSensitive: false);
-        final match = answerPattern.firstMatch(line.text.trim());
-        if (match != null) {
-          respostas.add({
-            "questao": match.group(1)!,
-            "resposta": match.group(2)!.toUpperCase(),
+        for (TextElement element in line.elements) {
+          allElements.add({
+            'text': element.text,
+            'bounds': element.boundingBox,
+            'centerX': (element.boundingBox.left + element.boundingBox.right) / 2,
+            'centerY': (element.boundingBox.top + element.boundingBox.bottom) / 2,
           });
         }
       }
     }
+
+    // Procurar por "Aluno" e encontrar o número mais próximo à direita
+    for (var element in allElements) {
+      if (element['text'].toLowerCase() == 'aluno') {
+        double alunoY = element['centerY'];
+        double alunoRight = element['bounds'].right;
+
+        // Procurar por números na mesma linha (±20 pixels) e à direita
+        for (var candidate in allElements) {
+          if (RegExp(r'^\d+$').hasMatch(candidate['text'])) {
+            double candidateY = candidate['centerY'];
+            double candidateLeft = candidate['bounds'].left;
+
+            // Verificar se está na mesma linha (±20 pixels) e à direita
+            if ((candidateY - alunoY).abs() <= 20 && candidateLeft > alunoRight) {
+              alunoId = candidate['text'];
+              break;
+            }
+          }
+        }
+        if (alunoId != null) break;
+      }
+    }
+
+    // Procurar por "Prova" e encontrar o número mais próximo à direita
+    for (var element in allElements) {
+      if (element['text'].toLowerCase() == 'prova') {
+        double provaY = element['centerY'];
+        double provaRight = element['bounds'].right;
+
+        // Procurar por números na mesma linha (±20 pixels) e à direita
+        for (var candidate in allElements) {
+          if (RegExp(r'^\d+$').hasMatch(candidate['text'])) {
+            double candidateY = candidate['centerY'];
+            double candidateLeft = candidate['bounds'].left;
+
+            // Verificar se está na mesma linha (±20 pixels) e à direita
+            if ((candidateY - provaY).abs() <= 20 && candidateLeft > provaRight) {
+              provaId = candidate['text'];
+              break;
+            }
+          }
+        }
+        if (provaId != null) break;
+      }
+    }
+
+    // Definir os IDs extraídos
+    if (alunoId != null) {
+      extractedData["alunoId"] = alunoId;
+    }
+    if (provaId != null) {
+      extractedData["provaId"] = provaId;
+    }
+    // --- Fim da Nova Lógica Espacial ---
+
+    // Lógica existente para extrair respostas
+    final Map<int, String> uniqueAnswers = {};
+    final answerPattern = RegExp(r"(\d+)\s*([A-Ea-e])"); // Ex: "1A", "2 C", "3E"
+
+    for (TextBlock block in recognizedText.blocks) {
+      for (TextLine line in block.lines) {
+        final matches = answerPattern.allMatches(line.text);
+        for (var match in matches) {
+          int? qNum = int.tryParse(match.group(1)!);
+          String? answer = match.group(2)!.toUpperCase();
+          if (qNum != null && answer != null) {
+            uniqueAnswers[qNum] = answer;
+          }
+        }
+      }
+    }
+
+    // Caso o padrão principal não capture tudo (provável para gabaritos de bolha),
+    // podemos tentar uma regex de fallback mais simples que procura por (Número) (Letra)
+    // em qualquer parte de uma linha, ignorando pontuações e outros textos ao redor.
+    if (uniqueAnswers.isEmpty) {
+      final fallbackAnswerPattern = RegExp(r"(\d+)\s*([A-E])", caseSensitive: false);
+      for (TextBlock block in recognizedText.blocks) {
+        for (TextLine line in block.lines) {
+          final matches = fallbackAnswerPattern.allMatches(line.text);
+          for (var match in matches) {
+            int? qNum = int.tryParse(match.group(1)!);
+            String? answer = match.group(2)!.toUpperCase();
+            if (qNum != null && answer != null) {
+              uniqueAnswers[qNum] = answer;
+            }
+          }
+        }
+      }
+    }
+
+    List<Map<String, String>> respostas = [];
+    uniqueAnswers.forEach((key, value) {
+      respostas.add({"questao": key.toString(), "resposta": value});
+    });
+
+    // Sort answers by question number for consistency
+    respostas.sort((a, b) => int.parse(a["questao"]!).compareTo(int.parse(b["questao"]!)));
+
     extractedData["respostas"] = respostas;
+
+    print('Extracted Data (after parsing):');
+    print('  Aluno ID: ${extractedData["alunoId"]}');
+    print('  Prova ID: ${extractedData["provaId"]}');
+    print('  Respostas: ${extractedData["respostas"]}');
 
     return extractedData;
   }
@@ -72,5 +164,3 @@ class OcrService {
     _textRecognizer.close();
   }
 }
-
-

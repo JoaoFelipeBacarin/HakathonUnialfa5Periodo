@@ -1,7 +1,7 @@
 class Resposta {
   final int alunoId;
-  final int questaoNumero;
-  final String alternativaSelecionada;
+  final int questaoNumero; // Propriedade questaoNumero é um int
+  final String alternativaSelecionada; // Propriedade alternativaSelecionada é uma String
   final DateTime dataResposta;
 
   Resposta({
