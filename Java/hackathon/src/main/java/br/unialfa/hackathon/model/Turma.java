@@ -1,5 +1,6 @@
 package br.unialfa.hackathon.model;
 
+import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,13 +17,40 @@ public class Turma {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private Long id;
 
     private String nome;
+    private String ano;
 
-    @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Aluno> alunos;
+    public Turma() {}
 
+    public Turma(String nome, String ano) {
+        this.nome = nome;
+        this.ano = ano;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getAno() {
+        return ano;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setAno(String ano) {
+        this.ano = ano;
+    }
 }
+
