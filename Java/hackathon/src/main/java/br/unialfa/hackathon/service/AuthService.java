@@ -1,35 +1,47 @@
+// src/main/java/br/unialfa/hackathon/service/AuthService.java
 package br.unialfa.hackathon.service;
 
+import br.unialfa.hackathon.dto.AuthResponse;
+import br.unialfa.hackathon.dto.LoginRequest;
+import br.unialfa.hackathon.dto.UsuarioResponse; // Importar UsuarioResponse
 import br.unialfa.hackathon.model.Usuario;
 import br.unialfa.hackathon.repository.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
+import br.unialfa.hackathon.security.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
-@RequiredArgsConstructor
 public class AuthService {
 
-    private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired private UsuarioRepository usuarioRepo;
+    @Autowired private JwtUtil jwtUtil;
+    @Autowired private PasswordEncoder passwordEncoder;
 
-    public Optional<Usuario> autenticar(String email, String senhaPura) {
-        Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+    public AuthResponse autenticar(LoginRequest login) {
+        Usuario usuario = usuarioRepo.findByEmail(login.email())
+                .orElseThrow(() -> new RuntimeException("Credenciais inválidas."));
 
-        if (usuario.isPresent()) {
-            boolean senhaOk = passwordEncoder.matches(senhaPura, usuario.get().getSenha());
-            if (senhaOk) {
-                return usuario;
-            }
+        if (!passwordEncoder.matches(login.senha(), usuario.getSenha())) {
+            throw new RuntimeException("Credenciais inválidas.");
         }
 
-        return Optional.empty();
+        String token = jwtUtil.gerarToken(usuario);
+
+        // Converter Usuario para UsuarioResponse
+        UsuarioResponse usuarioResponse = UsuarioResponse.builder()
+                .id(usuario.getId())
+                .nome(usuario.getNome())
+                .email(usuario.getEmail())
+                .role(usuario.getRole())
+                .build();
+
+        return new AuthResponse(token, usuarioResponse);
     }
 
+    // Você pode adicionar um método de cadastro se necessário (para admins, por exemplo)
     public Usuario cadastrar(Usuario usuario) {
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        return usuarioRepository.save(usuario);
+        return usuarioRepo.save(usuario);
     }
 }

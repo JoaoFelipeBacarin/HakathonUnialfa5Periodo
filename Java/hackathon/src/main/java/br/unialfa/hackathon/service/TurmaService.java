@@ -1,8 +1,7 @@
+// src/main/java/br/unialfa/hackathon/service/TurmaService.java
 package br.unialfa.hackathon.service;
 
-
 import br.unialfa.hackathon.model.Turma;
-import br.unialfa.hackathon.model.Usuario;
 import br.unialfa.hackathon.repository.TurmaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,10 +16,6 @@ public class TurmaService {
 
     public Turma salvar(Turma turma) {
         return repository.save(turma);
-    }
-
-    public List<Turma> listarPorProfessor(Usuario professor) {
-        return repository.findByProfessor(professor);
     }
 
     public List<Turma> listarTodas() {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hackathonflutter/services/auth_service.dart';
 import 'package:hackathonflutter/ui/widgets/barra_titulo.dart';
 import 'package:hackathonflutter/ui/widgets/botao_quadrado.dart';
-import 'package:hackathonflutter/ui/widgets/campo_texto.dart';
+import 'package:hackathonflutter/ui/widgets/campo_texto.dart'; // Importante: Garanta que esta é a versão atualizada
 import 'package:hackathonflutter/ui/pages/home_page.dart';
 import 'package:hackathonflutter/ui/widgets/msg_alerta.dart';
 import 'package:hackathonflutter/ui/widgets/circulo_espera.dart';
@@ -21,63 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final AuthService _authService = AuthService();
   bool _carregando = false;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: BarraTitulo.criar('Login'),
-      body: _carregando
-          ? const CirculoEspera()
-          : Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Icon(
-                Icons.account_circle,
-                size: 100,
-                color: Colors.blue,
-              ),
-              const SizedBox(height: 32.0),
-
-              CampoTexto(
-                controller: _emailController,
-                texto: 'E-mail ou Usuário',
-                teclado: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 16.0),
-
-              CampoTexto(
-                controller: _senhaController,
-                texto: 'Senha',
-                teclado: TextInputType.text,
-                isObscureText: true,
-              ),
-              const SizedBox(height: 32.0),
-
-              BotaoQuadrado(
-                clique: _realizarLogin,
-                texto: 'Entrar',
-                icone: Icons.login,
-              ),
-
-              const SizedBox(height: 16.0),
-
-              Text(
-                'Use: teste@email.com / 12345',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _realizarLogin() async {
+  Future<void> _fazerLogin() async {
     final email = _emailController.text.trim();
     final senha = _senhaController.text.trim();
 
@@ -133,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
         MsgAlerta().show(
           context: context,
           titulo: 'Erro',
-          texto: 'Ocorreu um erro durante o login. Tente novamente.',
+          texto: 'Ocorreu um erro ao tentar fazer login. Verifique sua conexão e tente novamente. Detalhes: $e',
         );
       }
     }
@@ -144,5 +88,81 @@ class _LoginPageState extends State<LoginPage> {
     _emailController.dispose();
     _senhaController.dispose();
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: BarraTitulo.criar('Login'),
+      body: _carregando
+          ? const CirculoEspera()
+          : Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0), // Padding geral para a tela
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                Icons.person_pin_outlined,
+                size: 100,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(height: 40),
+
+              // E-mail field
+              Padding( // Adicionado Padding ao CampoTexto individualmente
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: CampoTexto(
+                  controller: _emailController,
+                  texto: 'E-mail',
+                  teclado: TextInputType.emailAddress,
+                  isHabilitado: true,
+                ),
+              ),
+              // SizedBox(height: 10), // Removido, pois o padding no CampoTexto já controla isso
+
+              // Password field
+              Padding( // Adicionado Padding ao CampoTexto individualmente
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: CampoTexto(
+                  controller: _senhaController,
+                  texto: 'Senha',
+                  teclado: TextInputType.text,
+                  isObscureText: true,
+                  isHabilitado: true,
+                ),
+              ),
+              const SizedBox(height: 30), // Mantenha este para espaçamento com o botão
+
+              // Login Button
+              Padding( // Adicionado Padding para o botão também
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: BotaoQuadrado(
+                  texto: 'ENTRAR',
+                  acao: _fazerLogin,
+                  corFundo: Theme.of(context).colorScheme.primary,
+                  corTexto: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              TextButton(
+                onPressed: () {
+                  MsgAlerta().show(
+                    context: context,
+                    titulo: 'Funcionalidade Futura',
+                    texto: 'A recuperação de senha ainda não foi implementada.',
+                  );
+                },
+                child: Text(
+                  'Esqueceu sua senha?',
+                  style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

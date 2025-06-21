@@ -1,22 +1,68 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Hackathon</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .alert {
+            margin-top: 15px;
+        }
+    </style>
 </head>
-<body class="container mt-5">
-<h2>Login</h2>
-<form method="post" th:action="@{/login}">
-    <div class="form-group">
-        <label>Email:</label>
-        <input type="text" name="username" class="form-control" required />
+<body>
+<div class="login-container">
+    <h2 class="text-center mb-4">Login</h2>
+
+    <div th:if="${param.logout}" class="alert alert-info">
+        Você foi desconectado.
     </div>
-    <div class="form-group">
-        <label>Senha:</label>
-        <input type="password" name="password" class="form-control" required />
+    <div th:if="${erro}" class="alert alert-danger">
+        <span th:text="${erro}"></span>
     </div>
-    <div th:if="${erro}" class="alert alert-danger mt-3" th:text="${erro}"></div>
-    <button type="submit" class="btn btn-primary mt-3">Entrar</button>
-</form>
+    <div th:if="${param.cadastroSucesso}" class="alert alert-success">
+        Cadastro realizado com sucesso! Faça login.
+    </div>
+    <div th:if="${erroCadastro}" class="alert alert-danger">
+        <span th:text="${erroCadastro}"></span>
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <div class="form-group">
+            <label for="email">E-mail:</label>
+            <input type="email" class="form-control" id="username" name="username" required autofocus>
+        </div>
+        <div class="form-group">
+            <label for="senha">Senha:</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+    </form>
+
+    <hr>
+    <p class="text-center">Não tem uma conta? <a th:href="@{/cadastro}">Cadastre-se aqui</a></p>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
