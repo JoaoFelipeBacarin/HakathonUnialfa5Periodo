@@ -1,3 +1,4 @@
+// src/main/java/br/unialfa/hackathon/model/Turma.java
 package br.unialfa.hackathon.model;
 
 import jakarta.persistence.*;
@@ -8,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "turmas")
+@Table(name = "turma")
 public class Turma {
 
     @Id
@@ -17,6 +18,5 @@ public class Turma {
 
     private String nome;
 
-    @ManyToOne
-    private Usuario professor;
+    private String ano;
 }

@@ -1,27 +1,29 @@
 package br.unialfa.hackathon.api;
 
-import br.unialfa.hackathon.model.Usuario;
-import br.unialfa.hackathon.security.JwtUtil;
+import br.unialfa.hackathon.dto.LoginRequest;
 import br.unialfa.hackathon.service.AuthService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+
+@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/login")
-@RequiredArgsConstructor
+@RequestMapping("/auth")
 public class LoginApi {
+    @Autowired
+    private AuthService authService;
 
-    private final AuthService authService;
-    private final JwtUtil jwtUtil;
-
-    @PostMapping
-    public ResponseEntity<?> login(@RequestParam String email, @RequestParam String senha) {
-        return authService.autenticar(email, senha)
-                .map(usuario -> {
-                    String token = jwtUtil.generateToken(usuario);
-                    return ResponseEntity.ok().body(token);
-                })
-                .orElse(ResponseEntity.status(401).body("Credenciais inválidas"));
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest login) {
+        try {
+            return ResponseEntity.ok(authService.autenticar(login));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensagem", e.getMessage()));
+        }
     }
 }
+

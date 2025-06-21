@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="64fa1630-a7a6-412b-9954-f15fcdf88e42" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../Flutter/HackathonFlutter/lib/services/api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../Flutter/HackathonFlutter/lib/services/api_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Flutter/HackathonFlutter/lib/services/auth_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../Flutter/HackathonFlutter/lib/services/auth_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Flutter/HackathonFlutter/lib/ui/pages/login_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../Flutter/HackathonFlutter/lib/ui/pages/login_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Flutter/HackathonFlutter/lib/ui/widgets/botao_quadrado.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../Flutter/HackathonFlutter/lib/ui/widgets/botao_quadrado.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Flutter/HackathonFlutter/lib/ui/widgets/campo_texto.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../Flutter/HackathonFlutter/lib/ui/widgets/campo_texto.dart" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Mateuscheki&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/JoaoFelipeBacarin/HakathonUnialfa5Periodo.git&quot;,
+    &quot;accountId&quot;: &quot;92e709ed-09f6-438d-91e6-e9ad0436eb82&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2ykhWqNebpXKhu2cVpxCwnqr3Bh" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.HackathonApplication.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#13 on main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/src/git/HakathonUnialfa5Periodo/Java/hackathon&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="64fa1630-a7a6-412b-9954-f15fcdf88e42" name="Changes" comment="" />
+      <created>1750384512680</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1750384512680</updated>
+    </task>
+    <servers />
+  </component>
+</project>
