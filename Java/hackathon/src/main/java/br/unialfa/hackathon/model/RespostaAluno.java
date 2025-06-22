@@ -1,30 +1,40 @@
 package br.unialfa.hackathon.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "respostas_aluno")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Table(name = "respostas_alunos")
 public class RespostaAluno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private Prova prova;
+    @Column(nullable = false)
+    private Integer numeroQuestao;
 
-    @ManyToOne
-    private Usuario aluno;
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Alternativa respostaMarcada;
 
-    @Lob
-    private String respostas; // Ex: "ABCDDBADDC"
+    @Column(nullable = false)
+    private Boolean acertou;
 
-    private Integer acertos;
+    @Column
+    private Double pontuacao;
 
-    private Double nota;
+    // Relacionamentos
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "resultado_id")
+    private Resultado resultado;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "questao_id")
+    private Questao questao;
 }

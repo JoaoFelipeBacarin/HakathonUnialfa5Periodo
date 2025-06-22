@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h4>
+                        <i class="bi bi-book-half"></i>
+                        <span th:text="${disciplina.id != null ? 'Editar Disciplina' : 'Nova Disciplina'}">Nova Disciplina</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" th:action="@{/admin/disciplinas/salvar}" th:object="${disciplina}">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="codigo" class="form-label form-label-custom required">
+                                    Código da Disciplina
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-custom"
+                                       id="codigo"
+                                       th:field="*{codigo}"
+                                       placeholder="Ex: JAVA001"
+                                       pattern="[A-Z0-9]+"
+                                       maxlength="10"
+                                       required>
+                                <small class="text-muted">Use apenas letras maiúsculas e números</small>
+                            </div>
+
+                            <div class="col-md-8 mb-3">
+                                <label for="nome" class="form-label form-label-custom required">
+                                    Nome da Disciplina
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-custom"
+                                       id="nome"
+                                       th:field="*{nome}"
+                                       placeholder="Ex: Frameworks Java"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label form-label-custom">
+                                Descrição
+                            </label>
+                            <textarea class="form-control form-control-custom"
+                                      id="descricao"
+                                      th:field="*{descricao}"
+                                      rows="3"
+                                      placeholder="Descrição detalhada da disciplina e seus objetivos"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="cargaHoraria" class="form-label form-label-custom required">
+                                    Carga Horária
+                                </label>
+                                <div class="input-group">
+                                    <input type="number"
+                                           class="form-control form-control-custom"
+                                           id="cargaHoraria"
+                                           th:field="*{cargaHoraria}"
+                                           min="20"
+                                           max="200"
+                                           step="10"
+                                           placeholder="80"
+                                           required>
+                                    <span class="input-group-text">horas</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="ativa" class="form-label form-label-custom">
+                                    Status
+                                </label>
+                                <select class="form-select form-control-custom" id="ativa" th:field="*{ativa}">
+                                    <option value="true">Ativa</option>
+                                    <option value="false">Inativa</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Informações Adicionais -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title text-blue">
+                                    <i class="bi bi-info-circle"></i> Informações Importantes
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>O código da disciplina deve ser único e não pode ser alterado depois</li>
+                                    <li>A carga horária deve ser múltipla de 10 (ex: 40, 60, 80 horas)</li>
+                                    <li>Disciplinas inativas não podem ser vinculadas a novas turmas</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/admin/disciplinas" class="btn btn-secondary-custom">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="bi bi-check-circle"></i> Salvar Disciplina
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+
+<script>
+    // Formatar código para maiúsculas
+    document.getElementById('codigo').addEventListener('input', function(e) {
+        this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    });
+</script>
+</body>
+</html>

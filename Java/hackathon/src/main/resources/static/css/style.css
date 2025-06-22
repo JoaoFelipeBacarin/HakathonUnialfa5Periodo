@@ -1,0 +1,409 @@
+/* ========== VARIÁVEIS DE CORES ========== */
+:root {
+    --primary-blue: #0066CC;
+    --secondary-blue: #4A90E2;
+    --light-blue: #E8F2FF;
+    --dark-blue: #003D7A;
+    --hover-blue: #0052A3;
+    --text-blue: #1A5490;
+    --bg-light: #F5F8FB;
+    --white: #FFFFFF;
+    --gray-light: #F8F9FA;
+    --gray-medium: #E9ECEF;
+    --gray-dark: #6C757D;
+    --success: #28A745;
+    --danger: #DC3545;
+    --warning: #FFC107;
+    --info: #17A2B8;
+}
+
+/* ========== RESET E CONFIGURAÇÕES GERAIS ========== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ========== NAVBAR ========== */
+.navbar-custom {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem 0;
+}
+
+.navbar-custom .navbar-brand {
+    color: var(--white) !important;
+    font-weight: 600;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navbar-custom .navbar-brand i {
+    font-size: 1.5rem;
+}
+
+.navbar-custom .nav-link {
+    color: rgba(255,255,255,0.9) !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.navbar-custom .nav-link:hover {
+    color: var(--white) !important;
+    transform: translateY(-2px);
+}
+
+.navbar-custom .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background-color: var(--white);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.navbar-custom .nav-link:hover::after {
+    width: 80%;
+}
+
+/* ========== CARDS ========== */
+.card-custom {
+    background: var(--white);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.card-custom:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+}
+
+.card-custom .card-header {
+    background: linear-gradient(135deg, var(--light-blue) 0%, rgba(74, 144, 226, 0.1) 100%);
+    border-bottom: 2px solid var(--secondary-blue);
+    font-weight: 600;
+    color: var(--text-blue);
+    padding: 1rem 1.5rem;
+}
+
+.card-custom .card-body {
+    padding: 1.5rem;
+}
+
+/* ========== DASHBOARD CARDS ========== */
+.dashboard-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+}
+
+.dashboard-card:hover {
+    border-color: var(--secondary-blue);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.dashboard-card i {
+    font-size: 3rem;
+    color: var(--secondary-blue);
+    margin-bottom: 1rem;
+}
+
+.dashboard-card h5 {
+    color: var(--text-blue);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-card p {
+    color: var(--gray-dark);
+    margin-bottom: 1rem;
+}
+
+/* ========== BOTÕES ========== */
+.btn-primary-custom {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    border: none;
+    color: var(--white);
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.btn-primary-custom:hover {
+    background: linear-gradient(135deg, var(--hover-blue) 0%, var(--primary-blue) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    color: var(--white);
+}
+
+.btn-secondary-custom {
+    background: var(--white);
+    border: 2px solid var(--secondary-blue);
+    color: var(--secondary-blue);
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary-custom:hover {
+    background: var(--light-blue);
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+}
+
+/* ========== FORMULÁRIOS ========== */
+.form-control-custom {
+    border: 2px solid var(--gray-medium);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    background-color: var(--white);
+}
+
+.form-control-custom:focus {
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+    outline: none;
+}
+
+.form-label-custom {
+    color: var(--text-blue);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.required::after {
+    content: " *";
+    color: var(--danger);
+}
+
+/* ========== TABELAS ========== */
+.table-custom {
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.table-custom thead {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: var(--white);
+}
+
+.table-custom thead th {
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+}
+
+.table-custom tbody tr {
+    transition: all 0.3s ease;
+}
+
+.table-custom tbody tr:hover {
+    background-color: var(--light-blue);
+}
+
+.table-custom tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--gray-medium);
+}
+
+/* ========== ALERTS ========== */
+.alert-custom {
+    border-radius: 8px;
+    border: none;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.alert-success-custom {
+    background-color: #D4EDDA;
+    color: #155724;
+    border-left: 4px solid var(--success);
+}
+
+.alert-danger-custom {
+    background-color: #F8D7DA;
+    color: #721C24;
+    border-left: 4px solid var(--danger);
+}
+
+.alert-info-custom {
+    background-color: var(--light-blue);
+    color: var(--text-blue);
+    border-left: 4px solid var(--secondary-blue);
+}
+
+/* ========== LOGIN PAGE ========== */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--light-blue) 0%, var(--bg-light) 100%);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.login-header {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: var(--white);
+    padding: 2rem;
+    text-align: center;
+}
+
+.login-header h4 {
+    margin: 0;
+    font-weight: 600;
+}
+
+.login-header p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+}
+
+.login-body {
+    padding: 2rem;
+}
+
+/* ========== ESTATÍSTICAS ========== */
+.stat-box {
+    background: linear-gradient(135deg, var(--light-blue) 0%, rgba(74, 144, 226, 0.1) 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 2px solid var(--secondary-blue);
+}
+
+.stat-box h3 {
+    color: var(--primary-blue);
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.stat-box p {
+    color: var(--text-blue);
+    margin: 0.5rem 0 0 0;
+    font-weight: 500;
+}
+
+/* ========== BREADCRUMB ========== */
+.breadcrumb-custom {
+    background-color: var(--white);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    margin-bottom: 1.5rem;
+}
+
+.breadcrumb-custom .breadcrumb-item {
+    color: var(--gray-dark);
+}
+
+.breadcrumb-custom .breadcrumb-item.active {
+    color: var(--text-blue);
+    font-weight: 600;
+}
+
+.breadcrumb-custom .breadcrumb-item a {
+    color: var(--secondary-blue);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.breadcrumb-custom .breadcrumb-item a:hover {
+    color: var(--primary-blue);
+}
+
+/* ========== ANIMAÇÕES ========== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* ========== RESPONSIVIDADE ========== */
+@media (max-width: 768px) {
+    .dashboard-card {
+        margin-bottom: 1rem;
+    }
+
+    .navbar-custom .navbar-brand {
+        font-size: 1.1rem;
+    }
+
+    .card-custom {
+        margin-bottom: 1rem;
+    }
+}
+
+/* ========== UTILITIES ========== */
+.shadow-soft {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.bg-gradient-blue {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+}
+
+.text-blue {
+    color: var(--text-blue) !important;
+}
+
+.border-blue {
+    border-color: var(--secondary-blue) !important;
+}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-blue">
+                <i class="bi bi-book"></i> Gerenciar Disciplinas
+            </h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/admin/disciplinas/nova" class="btn btn-primary-custom">
+                <i class="bi bi-plus-circle"></i> Nova Disciplina
+            </a>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center p-3 border-primary">
+                <h4 class="text-primary mb-1" th:text="${#lists.size(disciplinas)}">12</h4>
+                <small class="text-muted">Total de Disciplinas</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center p-3 border-success">
+                <h4 class="text-success mb-1"
+                    th:text="${#lists.size(disciplinas.?[ativa])}">10</h4>
+                <small class="text-muted">Disciplinas Ativas</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center p-3 border-warning">
+                <h4 class="text-warning mb-1">25</h4>
+                <small class="text-muted">Turmas Vinculadas</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center p-3 border-info">
+                <h4 class="text-info mb-1">480</h4>
+                <small class="text-muted">Total de Horas</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Disciplinas -->
+    <div class="card card-custom fade-in">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover datatable">
+                    <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Carga Horária</th>
+                        <th>Turmas</th>
+                        <th>Status</th>
+                        <th width="120">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="disciplina : ${disciplinas}">
+                        <td>
+                            <span class="badge bg-secondary" th:text="${disciplina.codigo}">JAVA001</span>
+                        </td>
+                        <td th:text="${disciplina.nome}">Frameworks Java</td>
+                        <td>
+                            <small class="text-muted" th:text="${disciplina.descricao}">
+                                Desenvolvimento web com Spring Boot
+                            </small>
+                        </td>
+                        <td>
+                            <span class="badge bg-info" th:text="${disciplina.cargaHoraria + 'h'}">80h</span>
+                        </td>
+                        <td>
+                                <span class="badge bg-primary"
+                                      th:text="${disciplina.turmas != null ? #lists.size(disciplina.turmas) : 0}">3</span>
+                        </td>
+                        <td>
+                                <span class="badge"
+                                      th:classappend="${disciplina.ativa} ? 'bg-success' : 'bg-secondary'"
+                                      th:text="${disciplina.ativa} ? 'Ativa' : 'Inativa'">Ativa</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/admin/disciplinas/editar/{id}(id=${disciplina.id})}"
+                               class="btn btn-sm btn-secondary-custom me-1"
+                               title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a th:href="@{/admin/disciplinas/remover/{id}(id=${disciplina.id})}"
+                               class="btn btn-sm btn-danger"
+                               title="Desativar"
+                               onclick="return confirm('Tem certeza que deseja desativar esta disciplina?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${disciplinas.isEmpty()}" class="text-center py-5">
+                <i class="bi bi-book" style="font-size: 3rem; color: var(--gray-medium);"></i>
+                <p class="text-muted mt-3">Nenhuma disciplina cadastrada.</p>
+                <a href="/admin/disciplinas/nova" class="btn btn-primary-custom">
+                    <i class="bi bi-plus-circle"></i> Cadastrar Primeira Disciplina
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+</body>
+</html>

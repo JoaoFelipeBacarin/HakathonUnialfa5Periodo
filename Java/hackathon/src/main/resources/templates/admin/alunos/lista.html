@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-blue">
+                <i class="bi bi-person-badge"></i> Gerenciar Alunos
+            </h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <button class="btn btn-secondary-custom me-2" data-bs-toggle="modal" data-bs-target="#importModal">
+                <i class="bi bi-upload"></i> Importar
+            </button>
+            <a href="/admin/alunos/novo" class="btn btn-primary-custom">
+                <i class="bi bi-person-plus"></i> Novo Aluno
+            </a>
+        </div>
+    </div>
+
+    <!-- Barra de Busca -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-body">
+                    <form class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label form-label-custom">Buscar por nome</label>
+                            <input type="text" class="form-control form-control-custom" placeholder="Digite o nome do aluno...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-custom">Matrícula</label>
+                            <input type="text" class="form-control form-control-custom" placeholder="2024001">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-custom">Turma</label>
+                            <select class="form-select form-control-custom">
+                                <option value="">Todas as turmas</option>
+                                <option>ADS 2024.1</option>
+                                <option>SI 2024.1</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-secondary-custom w-100">
+                                <i class="bi bi-search"></i> Buscar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Alunos -->
+    <div class="card card-custom fade-in">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover datatable">
+                    <thead>
+                    <tr>
+                        <th>Matrícula</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>CPF</th>
+                        <th>Turmas</th>
+                        <th>Status</th>
+                        <th width="120">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="aluno : ${alunos}">
+                        <td>
+                            <span class="badge bg-secondary" th:text="${aluno.matricula}">2024001</span>
+                        </td>
+                        <td th:text="${aluno.nome}">Maria Santos</td>
+                        <td>
+                            <small th:text="${aluno.email}">maria.santos@email.com</small>
+                        </td>
+                        <td th:text="${aluno.telefone}">(44) 99999-0001</td>
+                        <td>
+                            <small class="text-muted" th:text="${aluno.cpf}">123.456.789-01</small>
+                        </td>
+                        <td>
+                                <span class="badge bg-primary"
+                                      th:text="${aluno.turmas != null ? #lists.size(aluno.turmas) : 0} + ' turma(s)'">2 turmas</span>
+                        </td>
+                        <td>
+                                <span class="badge"
+                                      th:classappend="${aluno.ativo} ? 'bg-success' : 'bg-secondary'"
+                                      th:text="${aluno.ativo} ? 'Ativo' : 'Inativo'">Ativo</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/admin/alunos/editar/{id}(id=${aluno.id})}"
+                               class="btn btn-sm btn-secondary-custom me-1"
+                               title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a th:href="@{/admin/alunos/remover/{id}(id=${aluno.id})}"
+                               class="btn btn-sm btn-danger"
+                               title="Desativar"
+                               onclick="return confirm('Tem certeza que deseja desativar este aluno?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${alunos.isEmpty()}" class="text-center py-5">
+                <i class="bi bi-person-x" style="font-size: 3rem; color: var(--gray-medium);"></i>
+                <p class="text-muted mt-3">Nenhum aluno cadastrado.</p>
+                <a href="/admin/alunos/novo" class="btn btn-primary-custom">
+                    <i class="bi bi-person-plus"></i> Cadastrar Primeiro Aluno
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Importação -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-upload"></i> Importar Alunos
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info-custom">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Formato do arquivo:</strong><br>
+                    O arquivo CSV deve conter as colunas: matrícula, nome, email, telefone, cpf
+                </div>
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Selecione o arquivo CSV</label>
+                        <input type="file" class="form-control" accept=".csv">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary-custom">
+                    <i class="bi bi-upload"></i> Importar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+</body>
+</html>

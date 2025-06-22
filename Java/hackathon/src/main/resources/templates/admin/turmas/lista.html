@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-blue">
+                <i class="bi bi-collection"></i> Gerenciar Turmas
+            </h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/admin/turmas/nova" class="btn btn-primary-custom">
+                <i class="bi bi-plus-circle"></i> Nova Turma
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-body">
+                    <form class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label form-label-custom">Ano</label>
+                            <select class="form-select form-control-custom">
+                                <option value="">Todos os anos</option>
+                                <option value="2024" selected>2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-custom">Período</label>
+                            <select class="form-select form-control-custom">
+                                <option value="">Todos</option>
+                                <option value="Matutino">Matutino</option>
+                                <option value="Vespertino">Vespertino</option>
+                                <option value="Noturno">Noturno</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-custom">Professor</label>
+                            <select class="form-select form-control-custom">
+                                <option value="">Todos os professores</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-secondary-custom w-100">
+                                <i class="bi bi-funnel"></i> Filtrar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Turmas -->
+    <div class="card card-custom fade-in">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover datatable">
+                    <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Disciplina</th>
+                        <th>Professor</th>
+                        <th>Período</th>
+                        <th>Ano</th>
+                        <th>Alunos</th>
+                        <th>Status</th>
+                        <th width="150">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="turma : ${turmas}">
+                        <td>
+                            <span class="badge bg-secondary" th:text="${turma.id}">1</span>
+                        </td>
+                        <td th:text="${turma.nome}">ADS 2024.1</td>
+                        <td th:text="${turma.disciplina.nome}">Frameworks Java</td>
+                        <td th:text="${turma.usuario.nome}">Prof. João Silva</td>
+                        <td>
+                                <span class="badge"
+                                      th:classappend="${turma.periodo == 'Matutino'} ? 'bg-warning text-dark' :
+                                                     (${turma.periodo == 'Vespertino'} ? 'bg-info' : 'bg-dark')"
+                                      th:text="${turma.periodo}">Noturno</span>
+                        </td>
+                        <td th:text="${turma.ano}">2024</td>
+                        <td>
+                                <span class="badge bg-primary"
+                                      th:text="${turma.alunos != null ? #lists.size(turma.alunos) : 0} + ' alunos'">25 alunos</span>
+                        </td>
+                        <td>
+                                <span class="badge"
+                                      th:classappend="${turma.ativa} ? 'bg-success' : 'bg-secondary'"
+                                      th:text="${turma.ativa} ? 'Ativa' : 'Inativa'">Ativa</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/admin/turmas/{id}/alunos(id=${turma.id})}"
+                               class="btn btn-sm btn-info text-white me-1"
+                               title="Gerenciar Alunos">
+                                <i class="bi bi-people"></i>
+                            </a>
+                            <a th:href="@{/admin/turmas/editar/{id}(id=${turma.id})}"
+                               class="btn btn-sm btn-secondary-custom me-1"
+                               title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a th:href="@{/admin/turmas/remover/{id}(id=${turma.id})}"
+                               class="btn btn-sm btn-danger"
+                               title="Desativar"
+                               onclick="return confirm('Tem certeza que deseja desativar esta turma?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${turmas.isEmpty()}" class="text-center py-5">
+                <i class="bi bi-collection" style="font-size: 3rem; color: var(--gray-medium);"></i>
+                <p class="text-muted mt-3">Nenhuma turma cadastrada.</p>
+                <a href="/admin/turmas/nova" class="btn btn-primary-custom">
+                    <i class="bi bi-plus-circle"></i> Criar Primeira Turma
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+</body>
+</html>

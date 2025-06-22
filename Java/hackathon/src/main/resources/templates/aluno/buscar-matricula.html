@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card card-custom fade-in">
+                <div class="card-header text-center">
+                    <h4>
+                        <i class="bi bi-search"></i> Consultar Notas
+                    </h4>
+                </div>
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-badge" style="font-size: 4rem; color: var(--secondary-blue);"></i>
+                        <p class="mt-3 text-muted">
+                            Para visualizar suas notas e histórico acadêmico,
+                            informe sua matrícula.
+                        </p>
+                    </div>
+
+                    <form th:action="@{/aluno/notas}" method="get">
+                        <div class="mb-4">
+                            <label for="matricula" class="form-label form-label-custom">
+                                <i class="bi bi-card-text"></i> Número da Matrícula
+                            </label>
+                            <input type="text"
+                                   class="form-control form-control-custom form-control-lg text-center"
+                                   id="matricula"
+                                   name="matricula"
+                                   placeholder="Ex: 2024001"
+                                   required
+                                   autofocus
+                                   pattern="[0-9]+"
+                                   maxlength="10">
+                            <small class="text-muted">Digite apenas números</small>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary-custom btn-lg">
+                                <i class="bi bi-search"></i> Buscar Notas
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="alert alert-info-custom">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Não sabe sua matrícula?</strong><br>
+                        Entre em contato com a secretaria acadêmica ou verifique seu cartão de estudante.
+                    </div>
+
+                    <!-- Mostrar erro se houver -->
+                    <div th:if="${erro}" class="alert alert-danger-custom mt-3">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span th:text="${erro}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+
+<script>
+    // Formatar input para aceitar apenas números
+    document.getElementById('matricula').addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+</script>
+</body>
+</html>

@@ -1,5 +1,10 @@
+
 package br.unialfa.hackathon.dto;
 
-public record LoginRequest(String email, String senha) {
+import lombok.Data;
 
+@Data
+public class LoginRequest {
+    private String username;
+    private String password;
 }

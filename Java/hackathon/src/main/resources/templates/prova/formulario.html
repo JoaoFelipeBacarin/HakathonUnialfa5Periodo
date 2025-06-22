@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h4>
+                        <i class="bi bi-clipboard-plus"></i>
+                        <span th:text="${prova.id != null ? 'Editar Prova' : 'Nova Prova'}">Nova Prova</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" th:action="@{/prova/salvar}" th:object="${prova}">
+                        <input type="hidden" th:field="*{id}">
+
+                        <!-- Informações Básicas -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="titulo" class="form-label form-label-custom required">
+                                    Título da Prova
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-custom"
+                                       id="titulo"
+                                       th:field="*{titulo}"
+                                       placeholder="Ex: Prova 1 - Fundamentos de Java"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="turma" class="form-label form-label-custom required">
+                                    Turma
+                                </label>
+                                <select class="form-select form-control-custom" id="turma" th:field="*{turma.id}" required>
+                                    <option value="">Selecione uma turma...</option>
+                                    <option th:each="turma : ${turmas}"
+                                            th:value="${turma.id}"
+                                            th:text="${turma.nome + ' - ' + turma.disciplina.nome}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="dataAplicacao" class="form-label form-label-custom required">
+                                    Data de Aplicação
+                                </label>
+                                <input type="date"
+                                       class="form-control form-control-custom"
+                                       id="dataAplicacao"
+                                       th:field="*{dataAplicacao}"
+                                       required>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="valorTotal" class="form-label form-label-custom">
+                                    Valor Total
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-custom"
+                                       id="valorTotal"
+                                       th:field="*{valorTotal}"
+                                       step="0.1"
+                                       min="0"
+                                       max="10"
+                                       placeholder="10.0">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label form-label-custom">
+                                    Total de Questões
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="bi bi-calculator"></i>
+                                    </span>
+                                    <input type="text"
+                                           class="form-control form-control-custom"
+                                           id="contador-questoes-display"
+                                           th:field="*{numeroQuestoes}"
+                                           value="0"
+                                           readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label form-label-custom">
+                                Descrição
+                            </label>
+                            <textarea class="form-control form-control-custom"
+                                      id="descricao"
+                                      th:field="*{descricao}"
+                                      rows="3"
+                                      placeholder="Descrição opcional da prova"></textarea>
+                        </div>
+
+                        <!-- Gabarito -->
+                        <div class="mb-4">
+                            <label for="gabarito" class="form-label form-label-custom required">
+                                Gabarito da Prova
+                            </label>
+                            <div class="card shadow-soft">
+                                <div class="card-body">
+                                    <div class="alert alert-info-custom mb-3">
+                                        <i class="bi bi-info-circle"></i>
+                                        <strong>Instruções:</strong> Digite as respostas corretas separadas por vírgula.
+                                        Use apenas as letras A, B, C, D ou E.
+                                    </div>
+
+                                    <textarea class="form-control form-control-custom"
+                                              id="gabarito"
+                                              name="gabarito"
+                                              rows="4"
+                                              placeholder="Exemplo: A,B,C,D,A,B,C,D,E,A"
+                                              required></textarea>
+
+                                    <div class="mt-3 row">
+                                        <div class="col-md-6">
+                                            <div class="card bg-light">
+                                                <div class="card-body p-2">
+                                                    <small>
+                                                        <strong>Exemplo para 10 questões:</strong><br>
+                                                        A,B,C,D,A,B,C,D,E,A
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="gabarito-preview" class="text-end" style="display: none;">
+                                                <small class="text-muted">Prévia do gabarito:</small>
+                                                <div id="preview-content" class="mt-2"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/prova/listar" class="btn btn-secondary-custom">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+
+                            <button type="submit" class="btn btn-primary-custom btn-lg">
+                                <i class="bi bi-check-circle"></i> Salvar Prova
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const gabaritoInput = document.getElementById('gabarito');
+        const contadorDisplay = document.getElementById('contador-questoes-display');
+        const previewDiv = document.getElementById('gabarito-preview');
+        const previewContent = document.getElementById('preview-content');
+
+        gabaritoInput.addEventListener('input', function() {
+            const gabarito = this.value.toUpperCase();
+            const questoes = gabarito.split(',').filter(q => q.trim() !== '');
+
+            // Atualizar contador
+            contadorDisplay.value = questoes.length;
+
+            // Validar e formatar
+            let gabaritoFormatado = [];
+            let temErro = false;
+
+            questoes.forEach((questao, index) => {
+                const letra = questao.trim();
+                if (['A', 'B', 'C', 'D', 'E'].includes(letra)) {
+                    gabaritoFormatado.push(letra);
+                } else if (letra !== '') {
+                    temErro = true;
+                }
+            });
+
+            // Atualizar o valor do input
+            if (!temErro) {
+               // this.value = gabaritoFormatado.join(',');
+            }
+
+            // Mostrar preview
+            if (gabaritoFormatado.length > 0) {
+                previewDiv.style.display = 'block';
+                let previewHTML = '<div class="d-flex flex-wrap gap-2">';
+                gabaritoFormatado.forEach((letra, index) => {
+                    previewHTML += `
+                        <div class="badge bg-primary" style="width: 40px;">
+                            ${index + 1}: ${letra}
+                        </div>
+                    `;
+                });
+                previewHTML += '</div>';
+                previewContent.innerHTML = previewHTML;
+            } else {
+                previewDiv.style.display = 'none';
+            }
+
+            // Adicionar classe de erro se houver caractere inválido
+            if (temErro) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    });
+</script>
+</body>
+</html>

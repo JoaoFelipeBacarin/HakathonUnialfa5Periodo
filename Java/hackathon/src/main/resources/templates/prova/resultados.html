@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${#{arrays.asList(
+    #{maps.of('label', 'Provas', 'url', '/prova/listar')},
+    #{maps.of('label', 'Resultados', 'url', '')}
+)})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+  <!-- Cabeçalho da Prova -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card card-custom fade-in">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <h3 class="text-blue mb-2" th:text="${prova.titulo}">Prova 1 - Fundamentos</h3>
+              <p class="mb-1">
+                <strong>Turma:</strong> <span th:text="${prova.turma.nome}">ADS 2024.1</span> |
+                <strong>Disciplina:</strong> <span th:text="${prova.turma.disciplina.nome}">Java</span>
+              </p>
+              <p class="text-muted mb-0">
+                <strong>Data de Aplicação:</strong>
+                <span th:text="${#temporals.format(prova.dataAplicacao, 'dd/MM/yyyy')}">15/03/2024</span> |
+                <strong>Total de Questões:</strong> <span th:text="${prova.numeroQuestoes}">10</span>
+              </p>
+            </div>
+            <div class="col-md-4 text-end">
+              <button class="btn btn-secondary-custom" onclick="window.print()">
+                <i class="bi bi-printer"></i> Imprimir
+              </button>
+              <button class="btn btn-success">
+                <i class="bi bi-download"></i> Exportar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estatísticas Gerais -->
+  <div class="row mb-4">
+    <div class="col-md-2">
+      <div class="stat-box text-center">
+        <h3 th:text="${estatisticas.totalAlunos}">30</h3>
+        <p>Total de Alunos</p>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="stat-box text-center">
+        <h3 th:text="${#numbers.formatDecimal(estatisticas.media, 1, 1)}">7.5</h3>
+        <p>Média da Turma</p>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="stat-box text-center">
+        <h3 class="text-success" th:text="${estatisticas.aprovados}">25</h3>
+        <p>Aprovados</p>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="stat-box text-center">
+        <h3 class="text-danger" th:text="${estatisticas.reprovados}">5</h3>
+        <p>Reprovados</p>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="stat-box text-center">
+        <h3 th:text="${#numbers.formatDecimal(estatisticas.notaMaxima, 1, 1)}">10.0</h3>
+        <p>Maior Nota</p>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="stat-box text-center">
+        <h3 th:text="${#numbers.formatDecimal(estatisticas.notaMinima, 1, 1)}">4.0</h3>
+        <p>Menor Nota</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfico de Aprovação -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card card-custom">
+        <div class="card-header">
+          <h5><i class="bi bi-pie-chart"></i> Taxa de Aprovação</h5>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <h2 class="text-primary"
+                th:text="${#numbers.formatDecimal(estatisticas.percentualAprovacao, 1, 1) + '%'}">83.3%</h2>
+          </div>
+          <div class="progress" style="height: 30px;">
+            <div class="progress-bar bg-success"
+                 th:style="'width: ' + ${estatisticas.percentualAprovacao} + '%'"
+                 th:text="${estatisticas.aprovados + ' aprovados'}">25 aprovados</div>
+            <div class="progress-bar bg-danger"
+                 th:style="'width: ' + ${100 - estatisticas.percentualAprovacao} + '%'"
+                 th:text="${estatisticas.reprovados + ' reprovados'}">5 reprovados</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card card-custom">
+        <div class="card-header">
+          <h5><i class="bi bi-bar-chart"></i> Distribuição de Notas</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="notasChart" height="150"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabela de Resultados -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card card-custom">
+        <div class="card-header">
+          <h5><i class="bi bi-list-ul"></i> Resultados Individuais</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover datatable">
+              <thead>
+              <tr>
+                <th>Posição</th>
+                <th>Matrícula</th>
+                <th>Nome</th>
+                <th>Acertos</th>
+                <th>Erros</th>
+                <th>Nota</th>
+                <th>Status</th>
+                <th>Detalhes</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="resultado, stat : ${estatisticas.resultados}">
+                <td>
+                  <span class="badge bg-secondary" th:text="${stat.index + 1}">1</span>
+                </td>
+                <td th:text="${resultado.aluno.matricula}">2024001</td>
+                <td th:text="${resultado.aluno.nome}">Maria Santos</td>
+                <td>
+                                        <span class="badge bg-success"
+                                              th:text="${resultado.acertos}">9</span>
+                </td>
+                <td>
+                                        <span class="badge bg-danger"
+                                              th:text="${resultado.erros}">1</span>
+                </td>
+                <td>
+                  <strong th:classappend="${resultado.nota >= 6.0 ? 'text-success' : 'text-danger'}"
+                          th:text="${#numbers.formatDecimal(resultado.nota, 1, 1)}">9.0</strong>
+                </td>
+                <td>
+                                        <span class="badge"
+                                              th:classappend="${resultado.nota >= 6.0 ? 'bg-success' : 'bg-danger'}"
+                                              th:text="${resultado.nota >= 6.0 ? 'Aprovado' : 'Reprovado'}">Aprovado</span>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-info text-white"
+                          data-bs-toggle="modal"
+                          data-bs-target="#detalhesModal"
+                          th:attr="data-aluno=${resultado.aluno.nome}, data-nota=${resultado.nota}">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botão Voltar -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <a href="/prova/listar" class="btn btn-secondary-custom">
+        <i class="bi bi-arrow-left"></i> Voltar às Provas
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalhes -->
+<div class="modal fade" id="detalhesModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalhes do Resultado</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Funcionalidade de detalhes do resultado será implementada aqui.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+  // Dados para o gráfico
+  const ctx = document.getElementById('notasChart').getContext('2d');
+  const notasChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: ['0-2', '2-4', '4-6', '6-8', '8-10'],
+          datasets: [{
+              label: 'Quantidade de Alunos',
+              data: [1, 2, 2, 10, 15],
+              backgroundColor: [
+                  '#DC3545',
+                  '#FFC107',
+                  '#FD7E14',
+                  '#28A745',
+                  '#0066CC'
+              ]
+          }]
+      },
+      options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  ticks: {
+                      stepSize: 1
+                  }
+              }
+          }
+      }
+  });
+</script>
+</body>
+</html>

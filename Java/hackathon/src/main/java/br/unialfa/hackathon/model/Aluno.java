@@ -1,30 +1,45 @@
 package br.unialfa.hackathon.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.util.List;
 
 @Entity
-@Getter
-@Setter
-@AllArgsConstructor
+@Table(name = "alunos")
+@Data
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@AllArgsConstructor
 public class Aluno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private Long id;
 
-    private String nome;
-    private Long ra;
-    private Long tipo;
-    private Boolean status;
-    private Date dataDeCadastro;
+    @Column(nullable = false, unique = true)
+    private String matricula;
 
-    @ManyToOne
-    @JoinColumn(name = "turma_id")
-    private Turma turma;
+    @Column(nullable = false)
+    private String nome;
+
+    @Column
+    private String email;
+
+    @Column
+    private String telefone;
+
+    @Column
+    private String cpf;
+
+    @Column
+    private Boolean ativo = true;
+
+    // Relacionamentos
+    @ManyToMany(mappedBy = "alunos")
+    private List<Turma> turmas;
+
+    @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Resultado> resultados;
 }
