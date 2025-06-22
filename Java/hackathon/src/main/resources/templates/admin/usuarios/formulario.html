@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h4>
+                        <i class="bi bi-person-plus"></i>
+                        <span th:text="${usuario.id != null ? 'Editar Usuário' : 'Novo Usuário'}">Novo Usuário</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" th:action="@{/admin/usuarios/salvar}" th:object="${usuario}">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nome" class="form-label form-label-custom required">Nome Completo</label>
+                                <input type="text"
+                                       class="form-control form-control-custom"
+                                       id="nome"
+                                       th:field="*{nome}"
+                                       placeholder="Ex: João da Silva"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label form-label-custom required">Email</label>
+                                <input type="email"
+                                       class="form-control form-control-custom"
+                                       id="email"
+                                       th:field="*{email}"
+                                       placeholder="exemplo@email.com"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="login" class="form-label form-label-custom required">Login</label>
+                                <input type="text"
+                                       class="form-control form-control-custom"
+                                       id="login"
+                                       th:field="*{login}"
+                                       placeholder="nome.sobrenome"
+                                       required>
+                                <small class="text-muted">Este será o nome de usuário para login</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label form-label-custom"
+                                       th:classappend="${usuario.id == null} ? 'required' : ''">
+                                    Senha
+                                </label>
+                                <input type="password"
+                                       class="form-control form-control-custom"
+                                       id="password"
+                                       name="password"
+                                       placeholder="Digite a senha"
+                                       th:required="${usuario.id == null}">
+                                <small class="text-muted" th:if="${usuario.id != null}">
+                                    Deixe em branco para manter a senha atual
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tipo" class="form-label form-label-custom required">Tipo de Usuário</label>
+                                <select class="form-select form-control-custom" id="tipo" th:field="*{tipo}" required>
+                                    <option value="">Selecione...</option>
+                                    <option th:each="tipo : ${tipos}"
+                                            th:value="${tipo}"
+                                            th:text="${tipo.descricao}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="ativo" class="form-label form-label-custom">Status</label>
+                                <select class="form-select form-control-custom" id="ativo" th:field="*{ativo}">
+                                    <option value="true">Ativo</option>
+                                    <option value="false">Inativo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/admin/usuarios" class="btn btn-secondary-custom">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="bi bi-check-circle"></i> Salvar Usuário
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+</body>
+</html>

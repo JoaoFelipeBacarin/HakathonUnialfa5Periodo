@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <!-- Informações do Aluno -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom fade-in">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="text-blue mb-0">
+                                <i class="bi bi-person-circle"></i>
+                                <span th:text="${aluno.nome}">Nome do Aluno</span>
+                            </h3>
+                            <p class="text-muted mb-0">
+                                <strong>Matrícula:</strong> <span th:text="${aluno.matricula}">2024001</span> |
+                                <strong>Email:</strong> <span th:text="${aluno.email}">aluno@email.com</span>
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="stat-box">
+                                <h3 th:text="${#numbers.formatDecimal(mediaGeral, 1, 1)}">8.5</h3>
+                                <p>Média Geral</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas Rápidas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-soft text-center p-3">
+                <h4 class="text-primary mb-1" th:text="${#lists.size(resultados)}">12</h4>
+                <small class="text-muted">Provas Realizadas</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-soft text-center p-3">
+                <h4 class="text-success mb-1"
+                    th:text="${#lists.size(resultados.?[nota >= 6.0])}">11</h4>
+                <small class="text-muted">Aprovações</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-soft text-center p-3">
+                <h4 class="text-danger mb-1"
+                    th:text="${#lists.size(resultados.?[nota < 6.0])}">1</h4>
+                <small class="text-muted">Reprovações</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-soft text-center p-3">
+                <h4 class="text-info mb-1"
+                    th:text="${resultados.isEmpty() ? '0' : #numbers.formatDecimal(resultados.![nota].stream().max().orElse(0), 1, 1)}">9.5</h4>
+                <small class="text-muted">Maior Nota</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Notas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h5><i class="bi bi-clipboard-data"></i> Histórico de Notas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover datatable">
+                            <thead>
+                            <tr>
+                                <th>Prova</th>
+                                <th>Disciplina</th>
+                                <th>Professor</th>
+                                <th>Data</th>
+                                <th>Questões</th>
+                                <th>Acertos</th>
+                                <th>Nota</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="resultado : ${resultados}">
+                                <td th:text="${resultado.prova.titulo}">Prova 1</td>
+                                <td th:text="${resultado.prova.turma.disciplina.nome}">Java</td>
+                                <td th:text="${resultado.prova.professor.nome}">Prof. João</td>
+                                <td th:text="${#temporals.format(resultado.prova.dataAplicacao, 'dd/MM/yyyy')}">15/03/2024</td>
+                                <td th:text="${resultado.prova.numeroQuestoes}">10</td>
+                                <td>
+                                        <span class="badge bg-primary"
+                                              th:text="${resultado.acertos + '/' + resultado.prova.numeroQuestoes}">8/10</span>
+                                </td>
+                                <td>
+                                    <strong th:classappend="${resultado.nota >= 6.0 ? 'text-success' : 'text-danger'}"
+                                            th:text="${#numbers.formatDecimal(resultado.nota, 1, 1)}">8.0</strong>
+                                </td>
+                                <td>
+                                        <span class="badge"
+                                              th:classappend="${resultado.nota >= 6.0 ? 'bg-success' : 'bg-danger'}"
+                                              th:text="${resultado.nota >= 6.0 ? 'Aprovado' : 'Reprovado'}">Aprovado</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div th:if="${resultados.isEmpty()}" class="text-center py-5">
+                        <i class="bi bi-inbox" style="font-size: 3rem; color: var(--gray-medium);"></i>
+                        <p class="text-muted mt-3">Nenhuma prova encontrada para esta matrícula.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voltar -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="/aluno/notas" class="btn btn-secondary-custom">
+                <i class="bi bi-arrow-left"></i> Nova Consulta
+            </a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+</body>
+</html>

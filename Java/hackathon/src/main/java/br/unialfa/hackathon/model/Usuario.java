@@ -1,26 +1,77 @@
-// src/main/java/br/unialfa/hackathon/model/Usuario.java
 package br.unialfa.hackathon.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import jakarta.persistence.Id;
+import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
+@Table(name = "usuarios")
 @Data
-public class Usuario {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Usuario implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nome;
-    private String email;
-    private String senha;
-    private String role; // <<--- ESTE CAMPO DEVE EXISTIR E TER UM GETTER
+    @Column(unique = true, nullable = false)
+    private String login;
 
-    // Se estiver usando Lombok @Data, os getters e setters são gerados automaticamente.
-    // Caso contrário, você precisaria de:
-    // public String getRole() { return this.role; }
-    // public void setRole(String role) { this.role = role; }
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String nome;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TipoUsuario tipo;
+
+    @Column
+    private String email;
+
+    @Column
+    private Boolean ativo = true;
+
+    // Relacionamentos
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Turma> turmas;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + tipo.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return login;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return ativo;
+    }
 }

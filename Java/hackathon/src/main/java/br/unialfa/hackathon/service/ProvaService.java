@@ -1,65 +1,85 @@
-//// src/main/java/br/unialfa/hackathon/service/ProvaService.java
-//package br.unialfa.hackathon.service;
-//
-//import br.unialfa.hackathon.dto.ProvaResponse; // Importar o novo DTO
-//import br.unialfa.hackathon.model.Disciplina;
-//import br.unialfa.hackathon.model.Prova;
-//import br.unialfa.hackathon.model.Turma;
-//import br.unialfa.hackathon.repository.ProvaRepository;
-//import br.unialfa.hackathon.repository.TurmaRepository; // Importar TurmaRepository
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
-//
-//import java.time.LocalDate;
-//import java.util.List;
-//import java.util.stream.Collectors;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class ProvaService {
-//
-//    private final ProvaRepository repository;
-//    private final TurmaRepository turmaRepository; // <--- INJETAR TurmaRepository
-//
-//    public Prova salvar(Prova prova) {
-//        return repository.save(prova);
-//    }
-//
-//    // Método existente
-//    public List<Prova> listarPorTurma(Turma turma) {
-//        return repository.findByTurma(turma);
-//    }
-//
-//    // NOVO MÉTODO: Buscar provas por ID da turma e converter para DTO
-//    public List<ProvaResponse> buscarProvasPorTurmaId(Long turmaId) {
-//        // 1. Busca a Turma pelo ID
-//        Turma turma = turmaRepository.findById(turmaId)
-//                .orElseThrow(() -> new RuntimeException("Turma não encontrada com ID: " + turmaId));
-//
-//        // 2. Busca as Provas associadas a essa Turma
-//        List<Prova> provas = repository.findByTurma(turma);
-//
-//        // 3. Converte cada Prova para ProvaResponse DTO
-//        return provas.stream()
-//                .map(prova -> ProvaResponse.builder()
-//                        .id(prova.getId())
-//                        .nome(prova.getNome()) // Assumi que o 'nome' do JSON é 'nome' na entidade
-//                        .disciplina(prova.getDisciplina()) // Assumi que 'disciplina' é String na entidade
-//                        .turmaId(prova.getTurma().getId()) // Pega apenas o ID da turma
-//                        .build())
-//                .collect(Collectors.toList());
-//    }
-//
-//
-//    public List<Prova> listarPorDisciplina(Disciplina disciplina) {
-//        return repository.findByDisciplina(disciplina);
-//    }
-//
-//    public List<Prova> listarPorData(LocalDate data) {
-//        return repository.findByDataAplicacao(data);
-//    }
-//
-//    public List<Prova> listarTodas() {
-//        return repository.findAll();
-//    }
-//}
+package br.unialfa.hackathon.service;
+
+import br.unialfa.hackathon.model.Prova;
+import br.unialfa.hackathon.model.Questao;
+import br.unialfa.hackathon.model.Usuario;
+import br.unialfa.hackathon.repository.ProvaRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ProvaService {
+
+    private final ProvaRepository provaRepository;
+    private final QuestaoService questaoService;
+
+    public List<Prova> findAll() {
+        return provaRepository.findByAtivaTrue();
+    }
+
+    public Prova findById(Long id) {
+        return provaRepository.findById(id).orElse(null);
+    }
+
+    @Transactional
+    public Prova save(Prova prova) {
+        return provaRepository.save(prova);
+    }
+
+    public void deleteById(Long id) {
+        Prova prova = findById(id);
+        if (prova != null) {
+            prova.setAtiva(false);
+            save(prova);
+        }
+    }
+
+    public List<Prova> findByProfessor(Usuario professor) {
+        return provaRepository.findByProfessorIdAndAtivaTrue(professor.getId());
+    }
+
+    public List<Prova> findByTurmaId(Long turmaId) {
+        return provaRepository.findByTurmaIdAndAtivaTrue(turmaId);
+    }
+
+    @Transactional
+    public Prova criarProvaComQuestoes(Prova prova, List<String> respostasCorretas) {
+        Prova provaSalva = save(prova);
+
+        for (int i = 0; i < respostasCorretas.size(); i++) {
+            Questao questao = new Questao();
+            questao.setNumero(i + 1);
+            questao.setRespostaCorreta(br.unialfa.hackathon.model.Alternativa.valueOf(respostasCorretas.get(i)));
+            questao.setProva(provaSalva);
+            questaoService.save(questao);
+        }
+
+        provaSalva.setNumeroQuestoes(respostasCorretas.size());
+        return save(provaSalva);
+    }
+
+    @Transactional
+    public Prova atualizarProvaComQuestoes(Prova prova, List<String> respostasCorretas) {
+        // Deletar questões antigas
+        List<Questao> questoesAntigas = questaoService.findByProvaId(prova.getId());
+        for (Questao questao : questoesAntigas) {
+            questaoService.deleteById(questao.getId());
+        }
+
+        // Criar novas questões
+        for (int i = 0; i < respostasCorretas.size(); i++) {
+            Questao questao = new Questao();
+            questao.setNumero(i + 1);
+            questao.setRespostaCorreta(br.unialfa.hackathon.model.Alternativa.valueOf(respostasCorretas.get(i)));
+            questao.setProva(prova);
+            questaoService.save(questao);
+        }
+
+        prova.setNumeroQuestoes(respostasCorretas.size());
+        return save(prova);
+    }
+}

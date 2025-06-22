@@ -1,7 +1,6 @@
 package br.unialfa.hackathon.service;
 
 import br.unialfa.hackathon.model.Disciplina;
-import br.unialfa.hackathon.model.Usuario;
 import br.unialfa.hackathon.repository.DisciplinaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,17 +11,37 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DisciplinaService {
 
-    private final DisciplinaRepository repository;
+    private final DisciplinaRepository disciplinaRepository;
 
-    public Disciplina salvar(Disciplina disciplina) {
-        return repository.save(disciplina);
+    public List<Disciplina> findAll() {
+        return disciplinaRepository.findByAtivaTrue();
     }
 
-    public List<Disciplina> listarPorProfessor(Usuario professor) {
-        return repository.findByProfessor(professor);
+    public Disciplina findById(Long id) {
+        return disciplinaRepository.findById(id).orElse(null);
     }
 
-    public List<Disciplina> listarTodas() {
-        return repository.findAll();
+    public Disciplina findByCodigo(String codigo) {
+        return disciplinaRepository.findByCodigo(codigo).orElse(null);
+    }
+
+    public Disciplina save(Disciplina disciplina) {
+        return disciplinaRepository.save(disciplina);
+    }
+
+    public void deleteById(Long id) {
+        Disciplina disciplina = findById(id);
+        if (disciplina != null) {
+            disciplina.setAtiva(false);
+            save(disciplina);
+        }
+    }
+
+    public List<Disciplina> findByNome(String nome) {
+        return disciplinaRepository.findByNomeContainingIgnoreCase(nome);
+    }
+
+    public boolean existsByCodigo(String codigo) {
+        return disciplinaRepository.findByCodigo(codigo).isPresent();
     }
 }

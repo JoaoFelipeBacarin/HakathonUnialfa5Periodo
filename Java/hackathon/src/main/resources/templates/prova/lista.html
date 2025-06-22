@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-blue">
+                <i class="bi bi-clipboard-data"></i> Minhas Provas
+            </h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/prova" class="btn btn-primary-custom">
+                <i class="bi bi-plus-circle"></i> Nova Prova
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom">
+                <div class="card-body">
+                    <form class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label form-label-custom">Turma</label>
+                            <select class="form-select form-control-custom">
+                                <option value="">Todas as turmas</option>
+                                <option>ADS 2024.1</option>
+                                <option>SI 2024.1</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-custom">Status</label>
+                            <select class="form-select form-control-custom">
+                                <option value="">Todos</option>
+                                <option value="pendente">Pendente</option>
+                                <option value="corrigida">Corrigida</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label form-label-custom">Período</label>
+                            <input type="month" class="form-control form-control-custom" value="2024-03">
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-secondary-custom w-100">
+                                <i class="bi bi-funnel"></i> Filtrar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-custom fade-in">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover datatable">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Título</th>
+                                <th>Turma</th>
+                                <th>Disciplina</th>
+                                <th>Data</th>
+                                <th>Questões</th>
+                                <th>Status</th>
+                                <th width="180">Ações</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="prova : ${provas}">
+                                <td th:text="${prova.id}">1</td>
+                                <td th:text="${prova.titulo}">Prova 1 - Fundamentos</td>
+                                <td th:text="${prova.turma.nome}">ADS 2024.1</td>
+                                <td th:text="${prova.turma.disciplina.nome}">Java</td>
+                                <td th:text="${#temporals.format(prova.dataAplicacao, 'dd/MM/yyyy')}">15/03/2024</td>
+                                <td>
+                                    <span class="badge bg-secondary" th:text="${prova.numeroQuestoes}">10</span>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${!prova.resultados.isEmpty() ? 'bg-success' : 'bg-warning'}"
+                                          th:text="${!prova.resultados.isEmpty() ? 'Corrigida' : 'Pendente'}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/prova/{id}(id=${prova.id})}" class="btn btn-sm btn-info-custom"
+                                       title="Ver Detalhes">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a th:href="@{/prova/{id}/editar(id=${prova.id})}" class="btn btn-sm btn-warning-custom"
+                                       title="Editar Prova">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger-custom"
+                                            th:attr="onclick=|confirmDelete('/prova/${prova.id}')|"
+                                            title="Excluir Prova">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:replace="~{base :: scripts}"></script>
+<script>
+    function confirmDelete(deleteUrl) {
+        if (confirm('Tem certeza que deseja excluir esta prova?')) {
+            window.location.href = deleteUrl;
+        }
+    }
+</script>
+</body>
+</html>

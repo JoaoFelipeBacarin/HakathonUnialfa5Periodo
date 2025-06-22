@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h4>
+                        <i class="bi bi-person-plus-fill"></i>
+                        <span th:text="${aluno.id != null ? 'Editar Aluno' : 'Novo Aluno'}">Novo Aluno</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" th:action="@{/admin/alunos/salvar}" th:object="${aluno}">
+                        <input type="hidden" th:field="*{id}">
+
+                        <!-- Dados Pessoais -->
+                        <h5 class="text-blue mb-3">
+                            <i class="bi bi-person"></i> Dados Pessoais
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="matricula" class="form-label form-label-custom required">
+                                    Matrícula
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-custom"
+                                       id="matricula"
+                                       th:field="*{matricula}"
+                                       placeholder="2024001"
+                                       pattern="[0-9]+"
+                                       maxlength="10"
+                                       required>
+                            </div>
+
+                            <div class="col-md-9 mb-3">
+                                <label for="nome" class="form-label form-label-custom required">
+                                    Nome Completo
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-custom"
+                                       id="nome"
+                                       th:field="*{nome}"
+                                       placeholder="Ex: Maria Santos Silva"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="cpf" class="form-label form-label-custom">
+                                    CPF
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-custom"
+                                       id="cpf"
+                                       th:field="*{cpf}"
+                                       placeholder="000.000.000-00"
+                                       maxlength="14">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="telefone" class="form-label form-label-custom">
+                                    Telefone
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-custom"
+                                       id="telefone"
+                                       th:field="*{telefone}"
+                                       placeholder="(00) 00000-0000"
+                                       maxlength="15">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Dados de Contato -->
+                        <h5 class="text-blue mb-3">
+                            <i class="bi bi-envelope"></i> Dados de Contato
+                        </h5>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label form-label-custom required">
+                                Email
+                            </label>
+                            <input type="email"
+                                   class="form-control form-control-custom"
+                                   id="email"
+                                   th:field="*{email}"
+                                   placeholder="aluno@exemplo.com"
+                                   required>
+                            <small class="text-muted">
+                                Este email será usado para comunicações acadêmicas
+                            </small>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Configurações -->
+                        <h5 class="text-blue mb-3">
+                            <i class="bi bi-gear"></i> Configurações
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="ativo" class="form-label form-label-custom">
+                                    Status
+                                </label>
+                                <select class="form-select form-control-custom" id="ativo" th:field="*{ativo}">
+                                    <option value="true">Ativo</option>
+                                    <option value="false">Inativo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title text-blue">
+                                    <i class="bi bi-lightbulb"></i> Observações
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>A matrícula deve ser única e não pode ser alterada depois</li>
+                                    <li>O aluno poderá consultar suas notas usando a matrícula</li>
+                                    <li>Após o cadastro, vincule o aluno às turmas apropriadas</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/admin/alunos" class="btn btn-secondary-custom">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="bi bi-check-circle"></i> Salvar Aluno
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+
+<script>
+    // Máscaras para os campos
+    document.addEventListener('DOMContentLoaded', function() {
+        // Máscara para CPF
+        const cpfInput = document.getElementById('cpf');
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+
+            if (value.length > 9) {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            } else if (value.length > 6) {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
+            } else if (value.length > 3) {
+                value = value.replace(/(\d{3})(\d{3})/, '$1.$2');
+            }
+
+            e.target.value = value;
+        });
+
+        // Máscara para telefone
+        const telefoneInput = document.getElementById('telefone');
+        telefoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+
+            if (value.length > 6) {
+                value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            } else if (value.length > 2) {
+                value = value.replace(/(\d{2})(\d{5})/, '($1) $2');
+            }
+
+            e.target.value = value;
+        });
+
+        // Matrícula apenas números
+        document.getElementById('matricula').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-blue mb-4">
+                <i class="bi bi-person"></i> Área do Aluno
+            </h2>
+            <p class="text-muted">Bem-vindo, <strong th:text="${usuario.nome}">Aluno</strong>!</p>
+        </div>
+    </div>
+
+    <!-- Cards de Estatísticas Pessoais -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-box fade-in">
+                <h3>8.5</h3>
+                <p>Média Geral</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box fade-in">
+                <h3>12</h3>
+                <p>Provas Realizadas</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box fade-in">
+                <h3>92%</h3>
+                <p>Taxa de Aprovação</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box fade-in">
+                <h3>3°</h3>
+                <p>Posição na Turma</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de Ações -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="dashboard-card fade-in">
+                <i class="bi bi-clipboard-check"></i>
+                <h5>Minhas Notas</h5>
+                <p>Visualizar resultados e desempenho nas provas</p>
+                <a href="/aluno/notas" class="btn btn-primary-custom">
+                    <i class="bi bi-eye"></i> Ver Notas
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="dashboard-card fade-in">
+                <i class="bi bi-clock-history"></i>
+                <h5>Histórico Acadêmico</h5>
+                <p>Acompanhar seu histórico completo de avaliações</p>
+                <a href="/aluno/historico" class="btn btn-primary-custom">
+                    <i class="bi bi-list"></i> Ver Histórico
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimas Notas -->
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h5><i class="bi bi-graph-up"></i> Últimas Avaliações</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Prova</th>
+                                <th>Disciplina</th>
+                                <th>Data</th>
+                                <th>Nota</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Prova 1 - Fundamentos</td>
+                                <td>Java Avançado</td>
+                                <td>15/03/2024</td>
+                                <td><strong class="text-success">9.0</strong></td>
+                                <td><span class="badge bg-success">Aprovado</span></td>
+                            </tr>
+                            <tr>
+                                <td>Avaliação HTML/CSS</td>
+                                <td>Desenvolvimento Web</td>
+                                <td>10/03/2024</td>
+                                <td><strong class="text-success">8.5</strong></td>
+                                <td><span class="badge bg-success">Aprovado</span></td>
+                            </tr>
+                            <tr>
+                                <td>Teste BD</td>
+                                <td>Banco de Dados</td>
+                                <td>05/03/2024</td>
+                                <td><strong class="text-warning">7.0</strong></td>
+                                <td><span class="badge bg-success">Aprovado</span></td>
+                            </tr>
+                            <tr>
+                                <td>Prova Mobile</td>
+                                <td>Flutter</td>
+                                <td>28/02/2024</td>
+                                <td><strong class="text-success">9.5</strong></td>
+                                <td><span class="badge bg-success">Aprovado</span></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumo do Semestre -->
+        <div class="col-md-4">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h5><i class="bi bi-calendar3"></i> Resumo do Semestre</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">Disciplinas Cursadas</small>
+                        <h4 class="text-blue">5 disciplinas</h4>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Provas Realizadas</small>
+                        <h4 class="text-blue">12 provas</h4>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Média do Semestre</small>
+                        <h4 class="text-success">8.5</h4>
+                    </div>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar bg-success" style="width: 85%">85%</div>
+                    </div>
+                    <small class="text-muted">Desempenho Geral</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações e Avisos -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h5><i class="bi bi-info-circle"></i> Informações Importantes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info-custom mb-3">
+                        <i class="bi bi-lightbulb"></i>
+                        <strong>Como funciona:</strong> As provas são corrigidas automaticamente através do aplicativo móvel utilizado pelos professores.
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6 class="text-blue">📱 Aplicação das Provas</h6>
+                            <p>O professor utiliza o app Flutter para capturar suas respostas durante a prova.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-blue">⚡ Correção Automática</h6>
+                            <p>Suas respostas são enviadas e corrigidas instantaneamente pelo sistema.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-blue">📊 Resultados</h6>
+                            <p>Você pode consultar suas notas e desempenho detalhado a qualquer momento.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+</body>
+</html>

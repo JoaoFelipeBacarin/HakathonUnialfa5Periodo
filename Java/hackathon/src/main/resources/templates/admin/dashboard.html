@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-blue mb-4">
+                <i class="bi bi-speedometer2"></i> Dashboard Administrativo
+            </h2>
+        </div>
+    </div>
+
+    <!-- Cards de Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-box fade-in">
+                <h3>150</h3>
+                <p>Total de Alunos</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box fade-in">
+                <h3>12</h3>
+                <p>Turmas Ativas</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box fade-in">
+                <h3>8</h3>
+                <p>Professores</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box fade-in">
+                <h3>24</h3>
+                <p>Provas Realizadas</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de Gerenciamento -->
+    <div class="row">
+        <!-- Usuários -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="dashboard-card fade-in">
+                <i class="bi bi-people"></i>
+                <h5>Usuários</h5>
+                <p>Gerenciar professores e administradores do sistema</p>
+                <a href="/admin/usuarios" class="btn btn-primary-custom">
+                    <i class="bi bi-gear"></i> Gerenciar
+                </a>
+            </div>
+        </div>
+
+        <!-- Disciplinas -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="dashboard-card fade-in">
+                <i class="bi bi-book"></i>
+                <h5>Disciplinas</h5>
+                <p>Cadastrar e gerenciar disciplinas oferecidas</p>
+                <a href="/admin/disciplinas" class="btn btn-primary-custom">
+                    <i class="bi bi-plus-circle"></i> Gerenciar
+                </a>
+            </div>
+        </div>
+
+        <!-- Turmas -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="dashboard-card fade-in">
+                <i class="bi bi-collection"></i>
+                <h5>Turmas</h5>
+                <p>Organizar turmas e associar alunos</p>
+                <a href="/admin/turmas" class="btn btn-primary-custom">
+                    <i class="bi bi-list-ul"></i> Gerenciar
+                </a>
+            </div>
+        </div>
+
+        <!-- Alunos -->
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="dashboard-card fade-in">
+                <i class="bi bi-person-badge"></i>
+                <h5>Alunos</h5>
+                <p>Cadastrar e gerenciar alunos matriculados</p>
+                <a href="/admin/alunos" class="btn btn-primary-custom">
+                    <i class="bi bi-person-plus"></i> Gerenciar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards Informativos -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h5><i class="bi bi-clipboard-check"></i> Últimas Provas Aplicadas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Prova</th>
+                                <th>Turma</th>
+                                <th>Data</th>
+                                <th>Professor</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Prova 1 - Java</td>
+                                <td>ADS 2024.1</td>
+                                <td>15/03/2024</td>
+                                <td>Prof. João</td>
+                            </tr>
+                            <tr>
+                                <td>Avaliação Web</td>
+                                <td>SI 2024.1</td>
+                                <td>14/03/2024</td>
+                                <td>Prof. Maria</td>
+                            </tr>
+                            <tr>
+                                <td>Teste BD</td>
+                                <td>ADS 2024.2</td>
+                                <td>13/03/2024</td>
+                                <td>Prof. Carlos</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-end mt-3">
+                        <a href="/prova/listar" class="btn btn-secondary-custom btn-sm">
+                            Ver Todas <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h5><i class="bi bi-graph-up"></i> Estatísticas Gerais</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Taxa de Aprovação Geral</span>
+                            <strong class="text-success">78%</strong>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-success" style="width: 78%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Média Geral das Notas</span>
+                            <strong class="text-primary">7.2</strong>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-primary" style="width: 72%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Provas Corrigidas</span>
+                            <strong class="text-info">92%</strong>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar bg-info" style="width: 92%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h5><i class="bi bi-lightning"></i> Ações Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="/admin/usuarios/novo" class="btn btn-secondary-custom w-100">
+                                <i class="bi bi-person-plus"></i> Novo Usuário
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="/admin/disciplinas/nova" class="btn btn-secondary-custom w-100">
+                                <i class="bi bi-book-half"></i> Nova Disciplina
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="/admin/turmas/nova" class="btn btn-secondary-custom w-100">
+                                <i class="bi bi-collection-fill"></i> Nova Turma
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="/admin/alunos/novo" class="btn btn-secondary-custom w-100">
+                                <i class="bi bi-person-badge-fill"></i> Novo Aluno
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+</body>
+</html>

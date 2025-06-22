@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h4>
+                        <i class="bi bi-collection-fill"></i>
+                        <span th:text="${turma.id != null ? 'Editar Turma' : 'Nova Turma'}">Nova Turma</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" th:action="@{/admin/turmas/salvar}" th:object="${turma}">
+                        <input type="hidden" th:field="*{id}">
+
+                        <!-- Informações Básicas -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nome" class="form-label form-label-custom required">
+                                    Nome da Turma
+                                </label>
+                                <input type="text"
+                                       class="form-control form-control-custom"
+                                       id="nome"
+                                       th:field="*{nome}"
+                                       placeholder="Ex: ADS 2024.1"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="disciplina" class="form-label form-label-custom required">
+                                    Disciplina
+                                </label>
+                                <select class="form-select form-control-custom"
+                                        id="disciplina"
+                                        th:field="*{disciplina.id}"
+                                        required>
+                                    <option value="">Selecione uma disciplina...</option>
+                                    <option th:each="disc : ${disciplinas}"
+                                            th:value="${disc.id}"
+                                            th:text="${disc.codigo + ' - ' + disc.nome}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="professor" class="form-label form-label-custom required">
+                                    Professor Responsável
+                                </label>
+                                <select class="form-select form-control-custom"
+                                        id="professor"
+                                        th:field="*{usuario.id}"
+                                        required>
+                                    <option value="">Selecione um professor...</option>
+                                    <option th:each="prof : ${professores}"
+                                            th:value="${prof.id}"
+                                            th:text="${prof.nome}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="periodo" class="form-label form-label-custom required">
+                                    Período
+                                </label>
+                                <select class="form-select form-control-custom"
+                                        id="periodo"
+                                        th:field="*{periodo}"
+                                        required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Matutino">Matutino</option>
+                                    <option value="Vespertino">Vespertino</option>
+                                    <option value="Noturno">Noturno</option>
+                                    <option value="Integral">Integral</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="ano" class="form-label form-label-custom required">
+                                    Ano
+                                </label>
+                                <input type="number"
+                                       class="form-control form-control-custom"
+                                       id="ano"
+                                       th:field="*{ano}"
+                                       min="2020"
+                                       max="2030"
+                                       placeholder="2024"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label form-label-custom">
+                                Descrição
+                            </label>
+                            <textarea class="form-control form-control-custom"
+                                      id="descricao"
+                                      th:field="*{descricao}"
+                                      rows="3"
+                                      placeholder="Informações adicionais sobre a turma"></textarea>
+                        </div>
+
+                        <!-- Seleção de Alunos -->
+                        <div class="mb-4">
+                            <label class="form-label form-label-custom">
+                                <i class="bi bi-people"></i> Alunos da Turma
+                            </label>
+                            <div class="card shadow-soft">
+                                <div class="card-body">
+                                    <div class="alert alert-info-custom mb-3">
+                                        <i class="bi bi-info-circle"></i>
+                                        Selecione os alunos que farão parte desta turma.
+                                        Use Ctrl+Click para selecionar múltiplos alunos.
+                                    </div>
+
+                                    <select class="form-select form-control-custom"
+                                            name="alunosIds"
+                                            multiple
+                                            size="10">
+                                        <option th:each="aluno : ${alunos}"
+                                                th:value="${aluno.id}"
+                                                th:selected="${turma.alunos != null and turma.alunos.contains(aluno)}"
+                                                th:text="${aluno.matricula + ' - ' + aluno.nome}">
+                                        </option>
+                                    </select>
+
+                                    <div class="mt-3 text-muted">
+                                        <small>
+                                            <i class="bi bi-lightbulb"></i>
+                                            Dica: Você também pode adicionar alunos posteriormente através da lista de turmas.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="ativa" class="form-label form-label-custom">
+                                    Status
+                                </label>
+                                <select class="form-select form-control-custom" id="ativa" th:field="*{ativa}">
+                                    <option value="true">Ativa</option>
+                                    <option value="false">Inativa</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/admin/turmas" class="btn btn-secondary-custom">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="bi bi-check-circle"></i> Salvar Turma
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+
+<script>
+    // Contador de alunos selecionados
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAlunos = document.querySelector('select[name="alunosIds"]');
+
+        function updateCounter() {
+            const selectedCount = selectAlunos.selectedOptions.length;
+            const counterElement = document.getElementById('alunos-counter');
+
+            if (!counterElement) {
+                const counter = document.createElement('div');
+                counter.id = 'alunos-counter';
+                counter.className = 'mt-2 text-info';
+                selectAlunos.parentNode.appendChild(counter);
+            }
+
+            document.getElementById('alunos-counter').innerHTML =
+                `<i class="bi bi-people"></i> <strong>${selectedCount}</strong> aluno(s) selecionado(s)`;
+        }
+
+        selectAlunos.addEventListener('change', updateCounter);
+        updateCounter();
+    });
+</script>
+</body>
+</html>

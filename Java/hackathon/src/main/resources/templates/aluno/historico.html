@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <!-- Cabeçalho do Aluno -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom fade-in">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="text-blue mb-2">
+                                <i class="bi bi-clock-history"></i> Histórico Acadêmico
+                            </h3>
+                            <h4 class="mb-1" th:text="${aluno.nome}">Nome do Aluno</h4>
+                            <p class="text-muted mb-0">
+                                <strong>Matrícula:</strong> <span th:text="${aluno.matricula}">2024001</span> |
+                                <strong>Email:</strong> <span th:text="${aluno.email}">aluno@email.com</span> |
+                                <strong>CPF:</strong> <span th:text="${aluno.cpf}">123.456.789-01</span>
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <button class="btn btn-secondary-custom" onclick="window.print()">
+                                <i class="bi bi-printer"></i> Imprimir
+                            </button>
+                            <button class="btn btn-success">
+                                <i class="bi bi-download"></i> Exportar PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumo Geral -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-box text-center fade-in">
+                <h3 th:text="${#numbers.formatDecimal(mediaGeral, 1, 1)}">8.5</h3>
+                <p>Média Geral</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box text-center fade-in">
+                <h3 th:text="${#lists.size(resultados)}">24</h3>
+                <p>Total de Provas</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box text-center fade-in">
+                <h3 class="text-success"
+                    th:text="${#numbers.formatDecimal(#lists.size(resultados.?[nota >= 6.0]) * 100.0 / #lists.size(resultados), 1, 1) + '%'}">92%</h3>
+                <p>Taxa de Aprovação</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-box text-center fade-in">
+                <h3 th:text="${#lists.size(turmasUnicas)}">5</h3>
+                <p>Disciplinas Cursadas</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de Evolução -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h5><i class="bi bi-graph-up"></i> Evolução de Desempenho</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="evolucaoChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Histórico por Período -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-custom fade-in">
+                <div class="card-header">
+                    <h5><i class="bi bi-calendar3"></i> Histórico Detalhado por Período</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Agrupamento por Ano/Semestre -->
+                    <div class="accordion" id="historicoAccordion">
+                        <!-- 2024.1 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#periodo2024-1">
+                                    <strong>2024.1 - Primeiro Semestre</strong>
+                                    <span class="ms-auto me-3">
+                                        <span class="badge bg-primary">6 provas</span>
+                                        <span class="badge bg-success">Média: 8.7</span>
+                                    </span>
+                                </button>
+                            </h2>
+                            <div id="periodo2024-1" class="accordion-collapse collapse show"
+                                 data-bs-parent="#historicoAccordion">
+                                <div class="accordion-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Disciplina</th>
+                                                <th>Prova</th>
+                                                <th>Professor</th>
+                                                <th>Questões</th>
+                                                <th>Acertos</th>
+                                                <th>Nota</th>
+                                                <th>Status</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="resultado : ${resultados2024_1}">
+                                                <td th:text="${#temporals.format(resultado.prova.dataAplicacao, 'dd/MM')}">15/03</td>
+                                                <td th:text="${resultado.prova.turma.disciplina.nome}">Java</td>
+                                                <td th:text="${resultado.prova.titulo}">Prova 1</td>
+                                                <td th:text="${resultado.prova.professor.nome}">Prof. João</td>
+                                                <td th:text="${resultado.prova.numeroQuestoes}">10</td>
+                                                <td>
+                                                        <span class="badge bg-primary"
+                                                              th:text="${resultado.acertos + '/' + resultado.prova.numeroQuestoes}">8/10</span>
+                                                </td>
+                                                <td>
+                                                    <strong th:classappend="${resultado.nota >= 6.0 ? 'text-success' : 'text-danger'}"
+                                                            th:text="${#numbers.formatDecimal(resultado.nota, 1, 1)}">8.0</strong>
+                                                </td>
+                                                <td>
+                                                        <span class="badge"
+                                                              th:classappend="${resultado.nota >= 6.0 ? 'bg-success' : 'bg-danger'}"
+                                                              th:text="${resultado.nota >= 6.0 ? 'Aprovado' : 'Reprovado'}">Aprovado</span>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2023.2 -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#periodo2023-2">
+                                    <strong>2023.2 - Segundo Semestre</strong>
+                                    <span class="ms-auto me-3">
+                                        <span class="badge bg-primary">5 provas</span>
+                                        <span class="badge bg-success">Média: 8.2</span>
+                                    </span>
+                                </button>
+                            </h2>
+                            <div id="periodo2023-2" class="accordion-collapse collapse"
+                                 data-bs-parent="#historicoAccordion">
+                                <div class="accordion-body">
+                                    <!-- Conteúdo similar ao período anterior -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${resultados.isEmpty()}" class="text-center py-5">
+                        <i class="bi bi-inbox" style="font-size: 3rem; color: var(--gray-medium);"></i>
+                        <p class="text-muted mt-3">Nenhuma prova encontrada no histórico.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="/aluno/notas" class="btn btn-secondary-custom">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+            <a href="/aluno/dashboard" class="btn btn-primary-custom">
+                <i class="bi bi-house"></i> Ir para Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    // Gráfico de evolução
+    const ctx = document.getElementById('evolucaoChart').getContext('2d');
+    const evolucaoChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+            datasets: [{
+                label: 'Média de Notas',
+                data: [7.5, 7.8, 8.0, 8.3, 8.5, 8.7],
+                borderColor: '#0066CC',
+                backgroundColor: 'rgba(0, 102, 204, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 10,
+                    ticks: {
+                        stepSize: 1

@@ -1,35 +1,45 @@
-// src/main/java/br/unialfa/hackathon/model/Aluno.java
 package br.unialfa.hackathon.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.util.List;
 
 @Entity
-@Getter
-@Setter
-@AllArgsConstructor
+@Table(name = "alunos")
+@Data
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@AllArgsConstructor
 public class Aluno {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(nullable = false, unique = true)
+    private String matricula;
+
+    @Column(nullable = false)
     private String nome;
-    private Long ra;
-    private Long tipo;
-    private Boolean status;
 
+    @Column
+    private String email;
 
-    @ManyToOne
-    @JoinColumn(name = "turma_id")
-    private Turma turma;
+    @Column
+    private String telefone;
 
-    @OneToOne // <--- Adiciona esta anotação para o relacionamento com Usuario
-    @JoinColumn(name = "usuario_id", unique = true) // <--- Coluna para a chave estrangeira do Usuario
-    private Usuario usuario; // <--- NOVO CAMPO: vínculo com a entidade Usuario (para o email)
+    @Column
+    private String cpf;
+
+    @Column
+    private Boolean ativo = true;
+
+    // Relacionamentos
+    @ManyToMany(mappedBy = "alunos")
+    private List<Turma> turmas;
+
+    @OneToMany(mappedBy = "aluno", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Resultado> resultados;
 }

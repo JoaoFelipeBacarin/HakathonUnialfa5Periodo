@@ -1,0 +1,164 @@
+    <!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sistema de Correção de Gabaritos</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+<!-- Navbar -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/dashboard">
+            <i class="bi bi-clipboard-check"></i>
+            Sistema de Gabaritos
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+
+                <!-- Menu Administrador -->
+                <li class="nav-item dropdown" sec:authorize="hasRole('ADMINISTRADOR')">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-gear"></i> Administração
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/admin/usuarios">
+                            <i class="bi bi-people"></i> Usuários
+                        </a></li>
+                        <li><a class="dropdown-item" href="/admin/disciplinas">
+                            <i class="bi bi-book"></i> Disciplinas
+                        </a></li>
+                        <li><a class="dropdown-item" href="/admin/turmas">
+                            <i class="bi bi-collection"></i> Turmas
+                        </a></li>
+                        <li><a class="dropdown-item" href="/admin/alunos">
+                            <i class="bi bi-person-badge"></i> Alunos
+                        </a></li>
+                    </ul>
+                </li>
+
+                <!-- Menu Professor -->
+                <li class="nav-item dropdown" sec:authorize="hasAnyRole('ADMINISTRADOR', 'PROFESSOR')">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-file-earmark-text"></i> Provas
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/prova">
+                            <i class="bi bi-plus-circle"></i> Nova Prova
+                        </a></li>
+                        <li><a class="dropdown-item" href="/prova/listar">
+                            <i class="bi bi-list-ul"></i> Minhas Provas
+                        </a></li>
+                    </ul>
+                </li>
+
+                <!-- Menu Aluno -->
+                <li class="nav-item dropdown" sec:authorize="hasRole('ALUNO')">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-journal-text"></i> Acadêmico
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/aluno/notas">
+                            <i class="bi bi-clipboard-data"></i> Minhas Notas
+                        </a></li>
+                        <li><a class="dropdown-item" href="/aluno/historico">
+                            <i class="bi bi-clock-history"></i> Histórico
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i>
+                        <span sec:authentication="name">Usuário</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li class="dropdown-header">
+                            <strong sec:authentication="principal.nome">Nome do Usuário</strong><br>
+                            <small class="text-muted" sec:authentication="principal.tipo">Tipo</small>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">
+                            <i class="bi bi-box-arrow-right"></i> Sair
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div th:fragment="breadcrumb(items)" class="container-fluid mt-3">
+    <nav th:fragment="breadcrumb(path)" aria-label="breadcrumb">
+        <ol class="breadcrumb breadcrumb-custom">
+            <li class="breadcrumb-item" th:each="item, stat : ${path}" th:classappend="${stat.last ? 'active' : ''}">
+                <span th:if="${stat.last}" th:text="${item.label}"></span>
+                <a th:unless="${stat.last}" th:href="${item.url}" th:text="${item.label}"></a>
+            </li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Alerts -->
+<div th:fragment="alerts" class="container-fluid mt-3">
+    <div th:if="${sucesso}" class="alert alert-success-custom alert-dismissible fade show fade-in" role="alert">
+        <i class="bi bi-check-circle"></i> <span th:text="${sucesso}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${erro}" class="alert alert-danger-custom alert-dismissible fade show fade-in" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> <span th:text="${erro}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${info}" class="alert alert-info-custom alert-dismissible fade show fade-in" role="alert">
+        <i class="bi bi-info-circle"></i> <span th:text="${info}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</div>
+
+<!-- Scripts -->
+<div th:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        // Inicializar DataTables
+        $(document).ready(function() {
+            $('.datatable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-BR.json'
+                },
+                pageLength: 10,
+                responsive: true
+            });
+        });
+    </script>
+</div>
+</body>
+</html>
