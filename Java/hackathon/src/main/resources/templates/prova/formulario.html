@@ -14,14 +14,13 @@
                 <div class="card-header">
                     <h4>
                         <i class="bi bi-clipboard-plus"></i>
-                        <span th:text="${prova.id != null ? 'Editar Prova' : 'Nova Prova'}">Nova Prova</span>
+                        <span th:text="${modoVisualizacao != null && modoVisualizacao ? 'Visualizar Prova' : (prova.id != null ? 'Editar Prova' : 'Nova Prova')}">Nova Prova</span>
                     </h4>
                 </div>
                 <div class="card-body">
                     <form method="post" th:action="@{/prova/salvar}" th:object="${prova}">
                         <input type="hidden" th:field="*{id}">
 
-                        <!-- Informações Básicas -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="titulo" class="form-label form-label-custom required">
@@ -32,18 +31,20 @@
                                        id="titulo"
                                        th:field="*{titulo}"
                                        placeholder="Ex: Prova 1 - Fundamentos de Java"
-                                       required>
+                                       required
+                                       th:disabled="${modoVisualizacao != null && modoVisualizacao}">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="turma" class="form-label form-label-custom required">
                                     Turma
                                 </label>
-                                <select class="form-select form-control-custom" id="turma" th:field="*{turma.id}" required>
+                                <select class="form-select form-control-custom" id="turma" th:field="*{turma.id}" required
+                                        th:disabled="${modoVisualizacao != null && modoVisualizacao}">
                                     <option value="">Selecione uma turma...</option>
                                     <option th:each="turma : ${turmas}"
                                             th:value="${turma.id}"
-                                            th:text="${turma.nome + ' - ' + turma.disciplina.nome}">
+                                            th:text="${turma.nome + ' - ' + turma.nome}">
                                     </option>
                                 </select>
                             </div>
@@ -57,8 +58,9 @@
                                 <input type="date"
                                        class="form-control form-control-custom"
                                        id="dataAplicacao"
-                                       th:field="*{dataAplicacao}"
-                                       required>
+                                       name="dataAplicacao" th:value="${dataAplicacaoFormatada}"
+                                       required
+                                       th:disabled="${modoVisualizacao != null && modoVisualizacao}">
                             </div>
 
                             <div class="col-md-4 mb-3">
@@ -72,7 +74,8 @@
                                        step="0.1"
                                        min="0"
                                        max="10"
-                                       placeholder="10.0">
+                                       placeholder="10.0"
+                                       th:disabled="${modoVisualizacao != null && modoVisualizacao}">
                             </div>
 
                             <div class="col-md-4 mb-3">
@@ -88,7 +91,8 @@
                                            id="contador-questoes-display"
                                            th:field="*{numeroQuestoes}"
                                            value="0"
-                                           readonly>
+                                           readonly
+                                           th:disabled="${modoVisualizacao != null && modoVisualizacao}">
                                 </div>
                             </div>
                         </div>
@@ -101,10 +105,10 @@
                                       id="descricao"
                                       th:field="*{descricao}"
                                       rows="3"
-                                      placeholder="Descrição opcional da prova"></textarea>
+                                      placeholder="Descrição opcional da prova"
+                                      th:disabled="${modoVisualizacao != null && modoVisualizacao}"></textarea>
                         </div>
 
-                        <!-- Gabarito -->
                         <div class="mb-4">
                             <label for="gabarito" class="form-label form-label-custom required">
                                 Gabarito da Prova
@@ -122,7 +126,8 @@
                                               name="gabarito"
                                               rows="4"
                                               placeholder="Exemplo: A,B,C,D,A,B,C,D,E,A"
-                                              required></textarea>
+                                              th:value="${gabaritoAtual}" required
+                                              th:disabled="${modoVisualizacao != null && modoVisualizacao}"></textarea>
 
                                     <div class="mt-3 row">
                                         <div class="col-md-6">
@@ -149,11 +154,11 @@
                         <hr class="my-4">
 
                         <div class="d-flex justify-content-between">
-                            <a href="/prova/listar" class="btn btn-secondary-custom">
+                            <a th:href="@{/prova/listar}" class="btn btn-secondary-custom">
                                 <i class="bi bi-arrow-left"></i> Voltar
                             </a>
 
-                            <button type="submit" class="btn btn-primary-custom btn-lg">
+                            <button type="submit" class="btn btn-primary-custom btn-lg" th:if="${modoVisualizacao == null || !modoVisualizacao}">
                                 <i class="bi bi-check-circle"></i> Salvar Prova
                             </button>
                         </div>
@@ -166,25 +171,26 @@
 
 <div th:replace="~{base :: scripts}"></div>
 
-<script>
+<script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function() {
         const gabaritoInput = document.getElementById('gabarito');
         const contadorDisplay = document.getElementById('contador-questoes-display');
         const previewDiv = document.getElementById('gabarito-preview');
         const previewContent = document.getElementById('preview-content');
 
-        gabaritoInput.addEventListener('input', function() {
-            const gabarito = this.value.toUpperCase();
-            const questoes = gabarito.split(',').filter(q => q.trim() !== '');
+        // Recebe o valor de modoVisualizacao do Thymeleaf
+        const modoVisualizacao = /*[[${modoVisualizacao}]]*/ false; // Se modoVisualizacao for nulo, será false
 
-            // Atualizar contador
-            contadorDisplay.value = questoes.length;
+        // Função para atualizar o preview e o contador
+        function updateGabaritoPreview(gabaritoText) {
+            const questoes = gabaritoText.toUpperCase().split(',').filter(q => q.trim() !== '');
 
-            // Validar e formatar
+            contadorDisplay.value = questoes.length; // Atualiza o contador de questões
+
             let gabaritoFormatado = [];
             let temErro = false;
 
-            questoes.forEach((questao, index) => {
+            questoes.forEach((questao) => {
                 const letra = questao.trim();
                 if (['A', 'B', 'C', 'D', 'E'].includes(letra)) {
                     gabaritoFormatado.push(letra);
@@ -193,12 +199,6 @@
                 }
             });
 
-            // Atualizar o valor do input
-            if (!temErro) {
-               // this.value = gabaritoFormatado.join(',');
-            }
-
-            // Mostrar preview
             if (gabaritoFormatado.length > 0) {
                 previewDiv.style.display = 'block';
                 let previewHTML = '<div class="d-flex flex-wrap gap-2">';
@@ -215,13 +215,28 @@
                 previewDiv.style.display = 'none';
             }
 
-            // Adicionar classe de erro se houver caractere inválido
-            if (temErro) {
-                this.classList.add('is-invalid');
-            } else {
-                this.classList.remove('is-invalid');
+            // Adiciona/remove classe de erro apenas se não estiver em modo de visualização
+            if (!modoVisualizacao) {
+                if (temErro) {
+                    gabaritoInput.classList.add('is-invalid');
+                } else {
+                    gabaritoInput.classList.remove('is-invalid');
+                }
             }
-        });
+        }
+
+        // --- Lógica de Inicialização ---
+        // Se o campo gabaritoInput tem um valor (modo editar ou visualizar), atualiza o preview na carga da página
+        if (gabaritoInput && gabaritoInput.value) {
+            updateGabaritoPreview(gabaritoInput.value);
+        }
+
+        // Adiciona o event listener de input APENAS se não estiver em modo de visualização
+        if (gabaritoInput && !modoVisualizacao) {
+            gabaritoInput.addEventListener('input', function() {
+                updateGabaritoPreview(this.value);
+            });
+        }
     });
 </script>
 </body>

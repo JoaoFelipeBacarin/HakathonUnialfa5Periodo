@@ -8,7 +8,6 @@
 <div th:replace="~{base :: alerts}"></div>
 
 <div class="container-fluid">
-    <!-- Informações do Aluno -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card card-custom fade-in">
@@ -36,7 +35,6 @@
         </div>
     </div>
 
-    <!-- Estatísticas Rápidas -->
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card shadow-soft text-center p-3">
@@ -60,14 +58,12 @@
         </div>
         <div class="col-md-3">
             <div class="card shadow-soft text-center p-3">
-                <h4 class="text-info mb-1"
-                    th:text="${resultados.isEmpty() ? '0' : #numbers.formatDecimal(resultados.![nota].stream().max().orElse(0), 1, 1)}">9.5</h4>
+                <h4 class="text-info mb-1" th:text="${#numbers.formatDecimal(maiorNota, 1, 1)}">9.5</h4>
                 <small class="text-muted">Maior Nota</small>
             </div>
         </div>
     </div>
 
-    <!-- Tabela de Notas -->
     <div class="row">
         <div class="col-12">
             <div class="card card-custom fade-in">
@@ -123,7 +119,6 @@
         </div>
     </div>
 
-    <!-- Voltar -->
     <div class="row mt-4">
         <div class="col-12">
             <a href="/aluno/notas" class="btn btn-secondary-custom">

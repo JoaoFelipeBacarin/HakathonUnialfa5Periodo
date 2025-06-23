@@ -21,42 +21,6 @@
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card card-custom">
-                <div class="card-body">
-                    <form class="row g-3 align-items-end">
-                        <div class="col-md-3">
-                            <label class="form-label form-label-custom">Turma</label>
-                            <select class="form-select form-control-custom">
-                                <option value="">Todas as turmas</option>
-                                <option>ADS 2024.1</option>
-                                <option>SI 2024.1</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label form-label-custom">Status</label>
-                            <select class="form-select form-control-custom">
-                                <option value="">Todos</option>
-                                <option value="pendente">Pendente</option>
-                                <option value="corrigida">Corrigida</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label form-label-custom">Período</label>
-                            <input type="month" class="form-control form-control-custom" value="2024-03">
-                        </div>
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-secondary-custom w-100">
-                                <i class="bi bi-funnel"></i> Filtrar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="row">
         <div class="col-12">
             <div class="card card-custom fade-in">
@@ -92,19 +56,19 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a th:href="@{/prova/{id}(id=${prova.id})}" class="btn btn-sm btn-info-custom"
+                                    <a th:href="@{/prova/visualizar/{id}(id=${prova.id})}" class="btn btn-sm btn-info-custom"
                                        title="Ver Detalhes">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a th:href="@{/prova/{id}/editar(id=${prova.id})}" class="btn btn-sm btn-warning-custom"
+                                    <a th:href="@{/prova/editar/{id}(id=${prova.id})}" class="btn btn-sm btn-warning-custom"
                                        title="Editar Prova">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-danger-custom"
-                                            th:attr="onclick=|confirmDelete('/prova/${prova.id}')|"
-                                            title="Excluir Prova">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+                                    <form th:action="@{/prova/remover/{id}(id=${prova.id})}" method="post" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir esta prova?');">
+                                        <button type="submit" class="btn btn-sm btn-danger-custom" title="Excluir Prova">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                             </tbody>
@@ -117,12 +81,5 @@
 </div>
 
 <script th:replace="~{base :: scripts}"></script>
-<script>
-    function confirmDelete(deleteUrl) {
-        if (confirm('Tem certeza que deseja excluir esta prova?')) {
-            window.location.href = deleteUrl;
-        }
-    }
-</script>
 </body>
 </html>

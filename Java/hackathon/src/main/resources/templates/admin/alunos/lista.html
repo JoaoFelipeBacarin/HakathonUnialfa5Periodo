@@ -15,47 +15,12 @@
             </h2>
         </div>
         <div class="col-md-4 text-end">
-            <button class="btn btn-secondary-custom me-2" data-bs-toggle="modal" data-bs-target="#importModal">
-                <i class="bi bi-upload"></i> Importar
-            </button>
             <a href="/admin/alunos/novo" class="btn btn-primary-custom">
                 <i class="bi bi-person-plus"></i> Novo Aluno
             </a>
         </div>
     </div>
 
-    <!-- Barra de Busca -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card card-custom">
-                <div class="card-body">
-                    <form class="row g-3 align-items-end">
-                        <div class="col-md-4">
-                            <label class="form-label form-label-custom">Buscar por nome</label>
-                            <input type="text" class="form-control form-control-custom" placeholder="Digite o nome do aluno...">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label form-label-custom">Matrícula</label>
-                            <input type="text" class="form-control form-control-custom" placeholder="2024001">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label form-label-custom">Turma</label>
-                            <select class="form-select form-control-custom">
-                                <option value="">Todas as turmas</option>
-                                <option>ADS 2024.1</option>
-                                <option>SI 2024.1</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-secondary-custom w-100">
-                                <i class="bi bi-search"></i> Buscar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Lista de Alunos -->
     <div class="card card-custom fade-in">
@@ -120,39 +85,6 @@
                 <a href="/admin/alunos/novo" class="btn btn-primary-custom">
                     <i class="bi bi-person-plus"></i> Cadastrar Primeiro Aluno
                 </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de Importação -->
-<div class="modal fade" id="importModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="bi bi-upload"></i> Importar Alunos
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-info-custom">
-                    <i class="bi bi-info-circle"></i>
-                    <strong>Formato do arquivo:</strong><br>
-                    O arquivo CSV deve conter as colunas: matrícula, nome, email, telefone, cpf
-                </div>
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label">Selecione o arquivo CSV</label>
-                        <input type="file" class="form-control" accept=".csv">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary-custom">
-                    <i class="bi bi-upload"></i> Importar
-                </button>
             </div>
         </div>
     </div>

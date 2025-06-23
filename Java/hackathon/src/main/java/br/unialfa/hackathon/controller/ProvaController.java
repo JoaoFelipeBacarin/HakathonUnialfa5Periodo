@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.time.format.DateTimeFormatter; // Importar para formatação
 
 @Controller
 @RequestMapping("/prova")
@@ -25,11 +27,17 @@ public class ProvaController {
     private final UsuarioService usuarioService;
     private final CorrecaoService correcaoService;
 
+    // Formatter para exibir datas no input type="date"
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     @GetMapping()
     public String iniciar(Model model, Authentication authentication) {
         Usuario usuario = usuarioService.findByUsername(authentication.getName());
-        model.addAttribute("prova", new Prova());
+        Prova novaProva = new Prova();
+        novaProva.setNumeroQuestoes(0); // Inicializa para nova prova
+        model.addAttribute("prova", novaProva);
         model.addAttribute("turmas", turmaService.findByProfessor(usuario));
+        model.addAttribute("gabaritoAtual", ""); // Sempre inicializar gabaritoAtual para nova prova
         model.addAttribute("breadcrumbs", Arrays.asList(
                 criarBreadcrumb("Provas", "/prova/listar"),
                 criarBreadcrumb("Nova Prova", "")
@@ -46,31 +54,19 @@ public class ProvaController {
             Usuario professor = usuarioService.findByUsername(authentication.getName());
             prova.setProfessor(professor);
 
-            // Parse do gabarito (ex: "A,B,C,D,A")
             List<String> respostasCorretas = Arrays.stream(gabarito.split(","))
                     .map(String::trim)
-                    .map(String::toUpperCase) // <-- aqui converte para letras maiúsculas
+                    .map(String::toUpperCase)
                     .filter(s -> !s.isEmpty())
                     .toList();
 
+            prova.setNumeroQuestoes(respostasCorretas.size());
+
             if (prova.getId() == null) {
-                // Nova prova
                 provaService.criarProvaComQuestoes(prova, respostasCorretas);
                 redirectAttributes.addFlashAttribute("sucesso", "Prova criada com sucesso!");
             } else {
-                // Edição de prova existente
-                Prova provaExistente = provaService.findById(prova.getId());
-                if (provaExistente == null) {
-                    throw new RuntimeException("Prova não encontrada para edição.");
-                }
-                // Atualiza apenas os campos permitidos para edição
-                provaExistente.setTitulo(prova.getTitulo());
-                provaExistente.setDescricao(prova.getDescricao());
-                provaExistente.setDataAplicacao(prova.getDataAplicacao());
-                provaExistente.setTurma(prova.getTurma());
-                provaExistente.setValorTotal(prova.getValorTotal());
-
-                provaService.atualizarProvaComQuestoes(provaExistente, respostasCorretas);
+                provaService.atualizarProvaComQuestoes(prova, respostasCorretas);
                 redirectAttributes.addFlashAttribute("sucesso", "Prova atualizada com sucesso!");
             }
             return "redirect:/prova/listar";
@@ -95,31 +91,37 @@ public class ProvaController {
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model, Authentication authentication) {
         Prova prova = provaService.findById(id);
-        if (prova != null) {
-            Usuario usuario = usuarioService.findByUsername(authentication.getName());
 
-            // Construir string do gabarito a partir das questões
-            StringBuilder gabaritoStr = new StringBuilder();
-            if (prova.getQuestoes() != null && !prova.getQuestoes().isEmpty()) {
-                for (int i = 0; i < prova.getQuestoes().size(); i++) {
-                    if (i > 0) gabaritoStr.append(",");
-                    gabaritoStr.append(prova.getQuestoes().get(i).getRespostaCorreta().name());
-                }
-            }
-
-            model.addAttribute("prova", prova);
-            model.addAttribute("turmas", turmaService.findByProfessor(usuario));
-            model.addAttribute("gabaritoAtual", gabaritoStr.toString());
-            model.addAttribute("breadcrumbs", Arrays.asList(
-                    criarBreadcrumb("Provas", "/prova/listar"),
-                    criarBreadcrumb("Editar", "")
-            ));
-            return "prova/formulario";
+        if (prova == null) {
+            return "redirect:/prova/listar";
         }
-        return "redirect:/prova/listar";
+
+        Usuario usuario = usuarioService.findByUsername(authentication.getName());
+
+        String gabaritoStr = prova.getQuestoes().stream()
+                .map(q -> q.getRespostaCorreta().name())
+                .collect(Collectors.joining(","));
+
+        model.addAttribute("prova", prova);
+        model.addAttribute("turmas", turmaService.findByProfessor(usuario));
+        model.addAttribute("gabaritoAtual", gabaritoStr);
+
+        // Garante que a data esteja no formato correto para input type="date"
+        if (prova.getDataAplicacao() != null) {
+            model.addAttribute("dataAplicacaoFormatada", prova.getDataAplicacao().format(DATE_FORMATTER));
+        }
+
+        prova.setNumeroQuestoes(prova.getQuestoes().size());
+
+        model.addAttribute("breadcrumbs", Arrays.asList(
+                criarBreadcrumb("Provas", "/prova/listar"),
+                criarBreadcrumb("Editar", "")
+        ));
+
+        return "prova/formulario";
     }
 
-    @GetMapping("/remover/{id}")
+    @PostMapping("/remover/{id}")
     public String remover(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             provaService.deleteById(id);
@@ -145,7 +147,39 @@ public class ProvaController {
         return "redirect:/prova/listar";
     }
 
-    // Método auxiliar para criar breadcrumb
+    @GetMapping("/visualizar/{id}")
+    public String visualizar(@PathVariable Long id, Model model) {
+        Prova prova = provaService.findById(id);
+
+        if (prova == null) {
+            return "redirect:/prova/listar";
+        }
+
+        String gabaritoStr = prova.getQuestoes().stream()
+                .map(q -> q.getRespostaCorreta().name())
+                .collect(Collectors.joining(","));
+
+        model.addAttribute("prova", prova);
+        model.addAttribute("turmas", turmaService.findAll());
+        model.addAttribute("gabaritoAtual", gabaritoStr);
+
+        // Garante que a data esteja no formato correto para input type="date"
+        if (prova.getDataAplicacao() != null) {
+            model.addAttribute("dataAplicacaoFormatada", prova.getDataAplicacao().format(DATE_FORMATTER));
+        }
+
+        model.addAttribute("modoVisualizacao", true);
+
+        prova.setNumeroQuestoes(prova.getQuestoes().size());
+
+        model.addAttribute("breadcrumbs", Arrays.asList(
+                criarBreadcrumb("Provas", "/prova/listar"),
+                criarBreadcrumb("Visualizar", "")
+        ));
+
+        return "prova/formulario";
+    }
+
     private Map<String, String> criarBreadcrumb(String label, String url) {
         Map<String, String> breadcrumb = new HashMap<>();
         breadcrumb.put("label", label);

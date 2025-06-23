@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{base :: head}"></head>
+
+<body>
+<div th:replace="~{base :: navbar}"></div>
+<div th:replace="~{base :: breadcrumb(${breadcrumbs})}"></div>
+<div th:replace="~{base :: alerts}"></div>
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-blue">
+                <i class="bi bi-collection"></i> Turmas
+            </h2>
+        </div>
+    </div>
+
+    <!-- Lista de Turmas -->
+    <div class="card card-custom fade-in">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover datatable">
+                    <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Disciplina</th>
+                        <th>Professor</th>
+                        <th>Período</th>
+                        <th>Ano</th>
+                        <th>Alunos</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="turma : ${turmas}">
+                        <td>
+                            <span class="badge bg-secondary" th:text="${turma.id}">1</span>
+                        </td>
+                        <td th:text="${turma.nome}">ADS 2024.1</td>
+                        <td th:text="${turma.disciplina.nome}">Frameworks Java</td>
+                        <td th:text="${turma.usuario.nome}">Prof. João Silva</td>
+                        <td>
+                                <span class="badge"
+                                      th:classappend="${turma.periodo == 'Matutino'} ? 'bg-warning text-dark' :
+                                                     (${turma.periodo == 'Vespertino'} ? 'bg-info' : 'bg-dark')"
+                                      th:text="${turma.periodo}">Noturno</span>
+                        </td>
+                        <td th:text="${turma.ano}">2024</td>
+                        <td>
+                                <span class="badge bg-primary"
+                                      th:text="${turma.alunos != null ? #lists.size(turma.alunos) : 0} + ' alunos'">25 alunos</span>
+                        </td>
+                        <td>
+                                <span class="badge"
+                                      th:classappend="${turma.ativa} ? 'bg-success' : 'bg-secondary'"
+                                      th:text="${turma.ativa} ? 'Ativa' : 'Inativa'">Ativa</span>
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${turmas.isEmpty()}" class="text-center py-5">
+                <i class="bi bi-collection" style="font-size: 3rem; color: var(--gray-medium);"></i>
+                <p class="text-muted mt-3">Nenhuma turma cadastrada.</p>
+                <a href="/admin/turmas/nova" class="btn btn-primary-custom">
+                    <i class="bi bi-plus-circle"></i> Criar Primeira Turma
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{base :: scripts}"></div>
+</body>
+</html>

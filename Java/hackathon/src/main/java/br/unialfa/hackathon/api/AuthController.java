@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,6 +26,9 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final UsuarioService usuarioService;
+
+    // Simples armazenamento de tokens em memória (em produção use JWT ou Redis)
+    private static final Map<String, Long> activeTokens = new ConcurrentHashMap<>();
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
@@ -40,15 +45,22 @@ public class AuthController {
             Usuario usuario = usuarioService.findByUsername(loginRequest.getUsername());
 
             if (usuario != null) {
-                // Gerar um token simples (substitua por JWT se necessário)
-                String token = "simple-token-" + usuario.getId() + "-" + System.currentTimeMillis();
+                // Gerar token único
+                String token = "TOKEN-" + UUID.randomUUID().toString();
 
-                LoginResponse response = new LoginResponse(
-                        token,
-                        "Bearer",
-                        usuario.getLogin(),
-                        3600L
-                );
+                // Armazenar token
+                activeTokens.put(token, usuario.getId());
+
+                // Criar response completo
+                Map<String, Object> response = new HashMap<>();
+                response.put("token", token);
+                response.put("type", "Bearer");
+                response.put("username", usuario.getLogin());
+                response.put("nome", usuario.getNome());
+                response.put("email", usuario.getEmail());
+                response.put("tipo", usuario.getTipo().name());
+                response.put("userId", usuario.getId());
+                response.put("expiresIn", 3600L);
 
                 return ResponseEntity.ok(response);
             }
@@ -57,12 +69,12 @@ public class AuthController {
 
         } catch (BadCredentialsException e) {
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Credenciais inválidas");
-            error.put("message", "Username ou password incorretos");
+            error.put("error", "INVALID_CREDENTIALS");
+            error.put("message", "Usuário ou senha incorretos");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Erro interno do servidor");
+            error.put("error", "INTERNAL_ERROR");
             error.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
@@ -74,33 +86,54 @@ public class AuthController {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
 
-                // Validação simples do token (substitua por JWT se necessário)
-                if (token.startsWith("simple-token-")) {
-                    Map<String, Object> response = new HashMap<>();
-                    response.put("valid", true);
-                    response.put("token", token);
-                    return ResponseEntity.ok(response);
+                // Verificar se token existe
+                if (activeTokens.containsKey(token)) {
+                    Long userId = activeTokens.get(token);
+                    Usuario usuario = usuarioService.findById(userId);
+
+                    if (usuario != null) {
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("valid", true);
+                        response.put("userId", userId);
+                        response.put("username", usuario.getLogin());
+                        response.put("tipo", usuario.getTipo().name());
+                        return ResponseEntity.ok(response);
+                    }
                 }
             }
 
             Map<String, Object> response = new HashMap<>();
             response.put("valid", false);
-            response.put("message", "Token inválido");
+            response.put("message", "Token inválido ou expirado");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Erro ao validar token");
+            error.put("error", "VALIDATION_ERROR");
             error.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Logout realizado com sucesso");
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                activeTokens.remove(token);
+            }
+
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Logout realizado com sucesso");
+            response.put("status", "SUCCESS");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Mesmo com erro, retorna sucesso no logout
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Logout realizado");
+            response.put("status", "SUCCESS");
+            return ResponseEntity.ok(response);
+        }
     }
 
     @GetMapping("/me")
@@ -109,33 +142,31 @@ public class AuthController {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);
 
-                // Extrair ID do usuário do token simples
-                if (token.startsWith("simple-token-")) {
-                    String[] parts = token.split("-");
-                    if (parts.length >= 3) {
-                        Long userId = Long.parseLong(parts[2]);
-                        Usuario usuario = usuarioService.findById(userId);
+                if (activeTokens.containsKey(token)) {
+                    Long userId = activeTokens.get(token);
+                    Usuario usuario = usuarioService.findById(userId);
 
-                        if (usuario != null) {
-                            Map<String, Object> response = new HashMap<>();
-                            response.put("id", usuario.getId());
-                            response.put("username", usuario.getLogin());
-                            response.put("nome", usuario.getNome());
-                            response.put("email", usuario.getEmail());
-                            response.put("tipo", usuario.getTipo());
-                            return ResponseEntity.ok(response);
-                        }
+                    if (usuario != null) {
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("id", usuario.getId());
+                        response.put("username", usuario.getLogin());
+                        response.put("nome", usuario.getNome());
+                        response.put("email", usuario.getEmail());
+                        response.put("tipo", usuario.getTipo().name());
+                        response.put("ativo", usuario.getAtivo());
+                        return ResponseEntity.ok(response);
                     }
                 }
             }
 
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Token inválido ou usuário não encontrado");
+            error.put("error", "UNAUTHORIZED");
+            error.put("message", "Token inválido ou usuário não encontrado");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
 
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Erro ao buscar usuário");
+            error.put("error", "USER_ERROR");
             error.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
