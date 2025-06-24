@@ -48,17 +48,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // Removida a validação de email, pois agora é username
-    /*
-    if (!email.isValidEmail) {
-      MsgAlerta().show(
-        context: context,
-        titulo: 'E-mail Inválido',
-        texto: 'Por favor, insira um e-mail válido.',
-      );
-      return;
-    }
-    */
+
 
     setState(() {
       _carregando = true;
@@ -81,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
           MsgAlerta.show(
             context: context,
             titulo: 'Erro de Login',
-            texto: 'Usuário ou senha inválidos. Tente novamente.', // Mensagem atualizada
+            texto: 'Usuário ou senha inválidos. Tente novamente.',
           );
         }
       }

@@ -21,35 +21,6 @@
         </div>
     </div>
 
-    <!-- Estatísticas -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-center p-3 border-primary">
-                <h4 class="text-primary mb-1" th:text="${#lists.size(disciplinas)}">12</h4>
-                <small class="text-muted">Total de Disciplinas</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center p-3 border-success">
-                <h4 class="text-success mb-1"
-                    th:text="${#lists.size(disciplinas.?[ativa])}">10</h4>
-                <small class="text-muted">Disciplinas Ativas</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center p-3 border-warning">
-                <h4 class="text-warning mb-1">25</h4>
-                <small class="text-muted">Turmas Vinculadas</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center p-3 border-info">
-                <h4 class="text-info mb-1">480</h4>
-                <small class="text-muted">Total de Horas</small>
-            </div>
-        </div>
-    </div>
-
     <!-- Lista de Disciplinas -->
     <div class="card card-custom fade-in">
         <div class="card-body">

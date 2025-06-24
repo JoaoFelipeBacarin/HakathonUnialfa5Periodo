@@ -5,15 +5,14 @@ import 'package:hackathonflutter/services/auth_service.dart'; // Importar AuthSe
 import 'package:flutter/foundation.dart'; // Para kDebugMode
 
 class ApiService {
-  // Use o IP da sua máquina para que o emulador/dispositivo possa acessar
-  // Certifique-se de que o backend está rodando e acessível neste IP e porta
-  final String _baseUrl = 'http://192.168.0.104:8080/api'; // Sua alteração
+
+  final String _baseUrl = 'http://172.16.2.190:8080/api';
 
   final AuthService _authService; // Injetar AuthService para obter o token
 
   ApiService(this._authService); // Construtor para receber AuthService
 
-  // Método GET para fazer requisições à API
+  // Metodo GET para fazer requisições à API
   Future<dynamic> get(String endpoint) async {
     final uri = Uri.parse('$_baseUrl/$endpoint');
     final token = await _authService.getToken(); // Obter o token de autenticação
@@ -69,7 +68,7 @@ class ApiService {
     }
   }
 
-  // Método POST para fazer requisições à API
+  // Metodo POST para fazer requisições à API
   Future<dynamic> post(String endpoint, Map<String, dynamic> data) async {
     final uri = Uri.parse('$_baseUrl/$endpoint');
     final token = await _authService.getToken();

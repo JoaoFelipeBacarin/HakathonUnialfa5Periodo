@@ -3,9 +3,9 @@ import 'package:http/http.dart' as http; // Para requisições HTTP
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  // Base URL da sua API. Para emuladores Android, '10.0.2.2' mapeia para localhost do PC.
-  // Para iOS Simulator ou device real, use o IP real da sua máquina ou um domínio.
-  static const String _baseUrl = 'http://192.168.0.104:8080/api';
+
+  static const String _baseUrl = 'http://172.16.2.190:8080/api';
+
 
   // Chaves para SharedPreferences
   static const String _keyToken = 'auth_token';
@@ -92,7 +92,7 @@ class AuthService {
     await prefs.remove(_keyUserTipo);
   }
 
-  // Novo método para validar o token com a API
+  // Novo metodo para validar o token com a API
   Future<bool> validarToken() async {
     final token = await getToken();
     if (token == null) {

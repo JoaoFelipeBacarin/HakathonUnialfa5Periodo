@@ -15,7 +15,7 @@ class HomePage extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Acessa o AuthService via Provider (listen: false pois só vamos chamar métodos)
+
     final authService = Provider.of<AuthService>(context, listen: false);
 
     return Scaffold(
@@ -56,7 +56,7 @@ class HomePage extends StatelessWidget {
                   icone: Icons.assignment,
                   texto: 'Preencher Gabarito',
                   clique: () {
-                    // Navega para a ListagemPage no modo padrão (seleção de aluno/prova)
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -65,24 +65,24 @@ class HomePage extends StatelessWidget {
                     );
                   },
                 ),
-                SizedBox(height: screenHeight * 0.03), // Espaçamento
+                SizedBox(height: screenHeight * 0.03),
 
                 // NOVO BOTÃO: Visualizar Gabaritos
-                BotaoQuadrado(
-                  icone: Icons.check_circle_outline, // Ícone para gabarito correto
-                  texto: 'Visualizar Gabaritos',
-                  clique: () {
-                    // Navega para a ListagemPage no modo de visualização de gabarito
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ListagemPage(isViewingGabarito: true),
-                      ),
-                    );
-                  },
-                ),
-                SizedBox(height: screenHeight * 0.03), // Espaçamento
-
+                // BotaoQuadrado(
+                //   icone: Icons.check_circle_outline, // Ícone para gabarito correto
+                //   texto: 'Visualizar Gabaritos',
+                //   clique: () {
+                //     // Navega para a ListagemPage no modo de visualização de gabarito
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => const ListagemPage(isViewingGabarito: true),
+                //       ),
+                //     );
+                //   },
+                // ),
+                // SizedBox(height: screenHeight * 0.03), // Espaçamento
+                //
                 // Botão para Escanear Gabarito (se ainda for usado)
                 BotaoQuadrado(
                   icone: Icons.camera_alt,
